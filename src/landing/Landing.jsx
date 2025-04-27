@@ -1,5 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import Spline from "@splinetool/react-spline";
+import Header from "../Home/Header";
 
 const style = {
   header: {
@@ -27,11 +28,18 @@ const style = {
   },
 }
 
+
 function Landing() {
+
+  
   return (
     <Box sx={{
        position: "relative",
     }}>
+      <Header 
+        key="header" 
+        style={{position: "fixed"}} 
+         />
       <Box
         sx={{
           overflow: "hidden",

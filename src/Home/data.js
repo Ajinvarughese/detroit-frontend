@@ -1,6 +1,7 @@
 export const header = [
   {
-    title: '产品',
+    title: 'home',
+    route:"",
     children: [
       {
         title: '云凤蝶', desc: '移动建站平台', img: 'https://gw.alipayobjects.com/zos/rmsportal/fLPzRmwAurHkPDVfHHiQ.svg', link: 'https://fengdie.alipay-eco.com/intro', top: '2px',
@@ -8,7 +9,8 @@ export const header = [
     ],
   },
   {
-    title: '设计体系',
+    title: 'about',
+    route:"",
     children: [
       {
         title: '设计价值观', desc: 'Design Values', img: 'https://gw.alipayobjects.com/zos/rmsportal/zMeJnhxAtpXPZAUhUKJH.svg', link: 'https://ant.design/docs/spec/values-cn',
@@ -22,7 +24,8 @@ export const header = [
     ],
   },
   {
-    title: '技术方案',
+    title: 'contact',
+    route:"",
     children: [
       {
         title: 'Ant Design', desc: '蚂蚁 UI 体系', img: 'https://gw.alipayobjects.com/zos/rmsportal/ruHbkzzMKShUpDYMEmHM.svg', link: 'https://ant.design',
@@ -36,12 +39,8 @@ export const header = [
     ],
   },
   {
-    title: '关于',
-    children: [
-      {
-        title: '蚂蚁金服体验科技专栏', desc: '探索极致用户体验与最佳工程实践', img: 'https://gw.alipayobjects.com/zos/rmsportal/VsVqfjYxPTJaFbPcZqMb.svg', link: 'https://zhuanlan.zhihu.com/xtech',
-      },
-    ],
+    title: 'login',
+    route: '/login',
   },
 ];
 export const banner = [

@@ -4,23 +4,37 @@ import { header } from './data';
 
 export default function Header(props) {
   const menuChild = header.map((item, i) => {
-    const content = item.children.map((child, ii) => (
-      <a href={child.link} key={ii.toString()} className="tip-block">
-        <span className="tip-img"><img src={child.img} alt="img" /></span>
-        <div className="tip-content">
-          {child.title}
-          <div>{child.desc}</div>
-        </div>
-      </a>
-    ));
+    const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+
+    const content = hasChildren
+      ? item.children.map((child, ii) => (
+          <a href={child.link} key={ii.toString()} className="tip-block">
+            <span className="tip-img">
+              <img src={child.img} alt="img" />
+            </span>
+            <div className="tip-content">
+              {child.title}
+              <div>{child.desc}</div>
+            </div>
+          </a>
+        ))
+      : null;
+
     return (
       <Col key={i.toString()} span={6}>
-        <Tooltip title={content} placement="bottom" overlayClassName="header-tip-wrap">
-          <span className="nav-title">{item.title}</span>
-        </Tooltip>
+        {hasChildren ? (
+          <Tooltip title={content} placement="bottom" overlayClassName="header-tip-wrap">
+            <span className="nav-title">{item.title}</span>
+          </Tooltip>
+        ) : (
+          <a href={item.route}>
+            <span className="nav-title">{item.title}</span>
+          </a>
+        )}
       </Col>
     );
   });
+
   return (
     <header {...props}>
       <Row className="nav">
