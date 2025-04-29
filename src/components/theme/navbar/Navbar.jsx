@@ -1,169 +1,53 @@
-import { AppBar, Box, Toolbar, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
-import Menu from '@mui/icons-material/MenuRounded';
-import { useEffect } from "react";
-import { useState } from 'react';
-import Style from './navStyle';
-import { Close } from "@mui/icons-material";
+import React, { useState } from 'react'
+import './Navbar.css'
+import { FaBars, FaTimes } from 'react-icons/fa'
 
+import logo_light from '../../../assets/logo-de.png'
+import logo_dark from '../../../assets/logo-deli.png'
+import search_icon_light from '../../../assets/search-w.png'
+import search_icon_dark from '../../../assets/search-b.png'
+import toggle_light from '../../../assets/night.png'
+import toggle_dark from '../../../assets/day.png'
 
-const style = Style();
-const Navbar = () => {
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false); // NEW
+const Navbar = ({ theme, setTheme }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
-    const style = Style(scrolled); // Pass scrolled to get dynamic style
+  const toggleMode = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light')
+  }
 
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
 
-    const handleReload = () => {
-        window.location.replace('/');
-    };
+  return (
+    <>
+      <div className='navbar'>
+        <img src={theme === 'light' ? logo_light : logo_dark} alt="Logo" className="Logo" />
 
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 0) {
-                setScrolled(true);
-            } else {
-                setScrolled(false);
-            }
-        };
+        <ul className={`nav-links ${sidebarOpen ? 'open' : ''}`}>
+          <a href='#'><li onClick={toggleSidebar}>Home</li></a>
+          <a href='#'><li onClick={toggleSidebar}>About</li></a>
+          <a href='#'><li onClick={toggleSidebar}>Loan details</li></a>
+          <a href='/login'><li onClick={toggleSidebar}>Login</li></a>
+        </ul>
 
-        window.addEventListener('scroll', handleScroll);
+        <div className="search-box">
+          <input type="text" placeholder="Search" />
+          <img src={theme === 'light' ? search_icon_light : search_icon_dark} alt="Search Icon" />
+        </div>
 
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
+        <img onClick={toggleMode} src={theme === 'light' ? toggle_light : toggle_dark} alt="Toggle Theme" className='toggle-icon' />
 
-    
+        <div className="menu-icon" onClick={toggleSidebar}>
+          {sidebarOpen ? <FaTimes /> : <FaBars />}
+        </div>
+      </div>
 
-    const drawer = (
-        <Box sx={style.drawer}>
-            <Box sx={{
-                width: '100%', 
-                textAlign: 'right',
-                marginTop: '0.7rem',
-            }}>
-                <Close sx={{
-                    fontSize: '30px',
-                    cursor: 'pointer',
-                    transition: '0.3s ease',
-                    '&:hover': {
-                        transform: 'scale(1.1)',
-                    }
-                }}
-                onClick={handleDrawerToggle}
-                />
-            </Box>
-            <List>
-                {['Home', 'About', 'Gallery', 'College', 'Year Book', 'Bright Minds', 'Notes', 'Athena'].map((text, index) => (
-                    <ListItem key={index} disablePadding>
-                        <ListItemButton
-                            onClick={() => {
-                                const trimmedRoute = text.toLowerCase().trim();
-                                let route = "";
+      {/* Optional: Overlay to close menu */}
+      {sidebarOpen && <div className="overlay" onClick={toggleSidebar}></div>}
+    </>
+  )
+}
 
-                                if (trimmedRoute === 'home') {
-                                    route = '/';
-                                } else if (trimmedRoute === 'college') {
-                                    window.location.href = 'https://marchrysostomcollege.com';
-                                    return;
-                                } else {
-                                    route = `/${trimmedRoute.replace(/\s+/g, '')}`;
-                                }
-                                
-                                window.location.replace(route);
-                            }}
-                        >
-                            <ListItemText primary={text} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
-
-        </Box>
-    );
-
-
-    return (
-        <>
-            <AppBar position="fixed" sx={style.appBar}>
-                <Toolbar sx={style.toolbar}>
-                    <Box sx={style.logo} onClick={handleReload}>
-                        <img style={style.logoImg} src="" alt="BCA" />
-                    </Box>
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Box sx={style.navlist}>
-                        {['Home', 'About', 'Gallery', 'College'].map((text, index) => (
-                            <ListItem key={index} onClick={() => {
-                                const trimmedRoute = text.toLowerCase().trim();
-                                let route = "";
-
-                                if (trimmedRoute === 'home') {
-                                    route = '/';
-                                } else if (trimmedRoute === 'college') {
-                                    // Use full URL directly for external link
-                                    window.location.href = 'https://marchrysostomcollege.com';
-                                    return;
-                                } else {
-                                    route = `/${trimmedRoute.replace(/\s+/g, '')}`;
-                                }
-
-                                window.location.replace(route);
-                            }}>
-                                {text}
-                            </ListItem>
-                        ))}
-                    </Box>
-
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        edge="end"
-                        onClick={handleDrawerToggle}
-                    >
-                        <Menu />
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
-
-            {/* Drawer for mobile navigation (coming from right) */}
-            <Drawer
-                anchor="right" // Changed anchor to right
-                open={mobileOpen}
-                onClose={handleDrawerToggle}
-                ModalProps={{ keepMounted: true }} // Improves performance on mobile
-                sx={{ 
-                    '& .MuiDrawer-paper': {
-                        padding: '1rem 5% 1rem 1%',
-                        overflowX: 'hidden',
-                        boxSizing: 'border-box',
-                        maxWidth: 280,
-                        width: '80%',
-                        backgroundColor: 'rgba(237,237,237,0.1)',
-                        backdropFilter: 'blur(12px)',
-
-                        // Scrollbar styling
-                        '&::-webkit-scrollbar': {
-                            width: '5px',
-                            background: 'var(--bg)',
-                        },
-                        '&::-webkit-scrollbar-thumb': {
-                            background: '#2D2D2D', 
-                            borderRadius: '10px',
-                        },
-                        '&::-webkit-scrollbar-thumb:hover': {
-                            background: '#424141ce',
-                        },
-                    },
-                }}
-            >
-                {drawer}
-            </Drawer>
-        </>
-    );
-};
-
-export default Navbar;
+export default Navbar

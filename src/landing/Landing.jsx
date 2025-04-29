@@ -1,6 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import Spline from "@splinetool/react-spline";
 import Navbar from "../components/theme/navbar/Navbar";
+import { useEffect, useState } from "react";
 
 const style = {
   header: {
@@ -31,12 +32,24 @@ const style = {
 
 function Landing() {
 
-  
+  const current_theme = localStorage.getItem('current_theme');
+  const [theme, setTheme] = useState(current_theme ? current_theme : 'light');
+
+  useEffect(()=>{
+    localStorage.setItem('current_theme',theme)
+  },[theme])
+
+//   return (
+//     <div className={theme === 'light' ? 'container' : 'container dark'}>
+//     </div> 
+//   );
+// };
+
   return (
     <Box sx={{
        position: "relative",
     }}>
-      <Navbar key="header" />
+       <Navbar theme={theme} setTheme={setTheme} />
       <Box
         sx={{
           overflow: "hidden",
