@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './Navbar.css'
 import { FaBars, FaTimes } from 'react-icons/fa'
 
@@ -11,6 +11,7 @@ import toggle_dark from '../../../assets/day.png'
 
 const Navbar = ({ theme, setTheme }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)  // State to track scroll
 
   const toggleMode = () => {
     setTheme(theme === 'light' ? 'dark' : 'light')
@@ -20,10 +21,27 @@ const Navbar = ({ theme, setTheme }) => {
     setSidebarOpen(!sidebarOpen)
   }
 
+  // Function to handle scroll event
+  const handleScroll = () => {
+    if (window.scrollY > 0) {
+      setScrolled(true)
+    } else {
+      setScrolled(false)
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
   return (
     <>
-      <div className='navbar'>
-        <img src={theme === 'light' ? logo_light : logo_dark} alt="Logo" className="Logo" />
+      <div className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+        <img src={theme === 'light' ? logo_light : logo_dark} alt="Logo" className="logo" />
 
         <ul className={`nav-links ${sidebarOpen ? 'open' : ''}`}>
           <a href='#'><li onClick={toggleSidebar}>Home</li></a>

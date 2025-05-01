@@ -1,7 +1,8 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import Spline from "@splinetool/react-spline";
 import Navbar from "../components/theme/navbar/Navbar";
 import { useEffect, useState } from "react";
+import Background from "../components/theme/background/background";
 
 const style = {
   header: {
@@ -50,7 +51,7 @@ function Landing() {
        position: "relative",
     }}>
        <Navbar theme={theme} setTheme={setTheme} />
-      <Box
+      <Background
         sx={{
           overflow: "hidden",
           minHeight: "600px",
@@ -62,7 +63,7 @@ function Landing() {
           className="w-full h-full"
           scene="https://prod.spline.design/l9uYXrNtML6SbrEf/scene.splinecode"
         />
-      </Box>    
+      </Background>    
 
       <Box sx={style.header} >
       </Box>
