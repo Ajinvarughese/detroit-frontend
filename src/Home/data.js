@@ -1,48 +1,4 @@
-export const header = [
-  {
-    title: 'home',
-    route: "",
-    children: [
-      {
-        title: 'Yunfengdie', desc: 'Mobile Site Builder Platform', img: 'https://gw.alipayobjects.com/zos/rmsportal/fLPzRmwAurHkPDVfHHiQ.svg', link: 'https://fengdie.alipay-eco.com/intro', top: '2px',
-      },
-    ],
-  },
-  {
-    title: 'about',
-    route: "",
-    children: [
-      {
-        title: 'Design Values', desc: 'Design Values', img: 'https://gw.alipayobjects.com/zos/rmsportal/zMeJnhxAtpXPZAUhUKJH.svg', link: 'https://ant.design/docs/spec/values-cn',
-      },
-      {
-        title: 'Visual', desc: 'Visual', img: 'https://gw.alipayobjects.com/zos/rmsportal/qkNZxQRDqvFJscXVDmKp.svg', link: 'https://ant.design/docs/spec/colors-cn',
-      },
-      {
-        title: 'Visualisation', desc: 'Visualisation', img: 'https://gw.alipayobjects.com/zos/rmsportal/MrUQjZNOJhYJCSZZuJDr.svg', link: 'https://antv.alipay.com/zh-cn/vis/index.html',
-      },
-    ],
-  },
-  {
-    title: 'contact',
-    route: "",
-    children: [
-      {
-        title: 'Ant Design', desc: 'Ant UI System', img: 'https://gw.alipayobjects.com/zos/rmsportal/ruHbkzzMKShUpDYMEmHM.svg', link: 'https://ant.design',
-      },
-      {
-        title: 'AntV', desc: 'Ant Data Visualization Solutions', img: 'https://gw.alipayobjects.com/zos/rmsportal/crqUoMinEgjMeGGFAKzG.svg', link: 'https://antv.alipay.com',
-      },
-      {
-        title: 'Egg', desc: 'Enterprise-level Node Development Framework', img: 'https://gw.alipayobjects.com/zos/rmsportal/nEEwwpmNVihZimnBAtMf.svg', link: 'https://eggjs.org',
-      },
-    ],
-  },
-  {
-    title: 'login',
-    route: '/login',
-  },
-];
+
 
 export const banner = [
   {

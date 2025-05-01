@@ -2,20 +2,21 @@ import React, { useState, useEffect } from 'react'
 import './Navbar.css'
 import { FaBars, FaTimes } from 'react-icons/fa'
 
-import logo_light from '../../../assets/logo-de.png'
-import logo_dark from '../../../assets/logo-deli.png'
+import logo_light from '../../../assets/DETROIT.png'
 import search_icon_light from '../../../assets/search-w.png'
-import search_icon_dark from '../../../assets/search-b.png'
-import toggle_light from '../../../assets/night.png'
-import toggle_dark from '../../../assets/day.png'
 
-const Navbar = ({ theme, setTheme }) => {
+
+const Navbar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)  // State to track scroll
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  const toggleMode = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light')
-  }
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
@@ -41,24 +42,37 @@ const Navbar = ({ theme, setTheme }) => {
   return (
     <>
       <div className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-        <img src={theme === 'light' ? logo_light : logo_dark} alt="Logo" className="logo" />
+        <img src={logo_light} alt="Logo" className="logo" />
 
-        <ul className={`nav-links ${sidebarOpen ? 'open' : ''}`}>
-          <a href='#'><li onClick={toggleSidebar}>Home</li></a>
-          <a href='#'><li onClick={toggleSidebar}>About</li></a>
-          <a href='#'><li onClick={toggleSidebar}>Loan details</li></a>
-          <a href='/login'><li onClick={toggleSidebar}>Login</li></a>
+        <ul
+          style={
+            isMobile
+              ? {
+                  background: scrolled ? '#fff' : 'transparent',
+                  backdropFilter: 'blur(15px)',
+                  '&a': {
+                    color: scrolled ? '#000' : '#fff',
+                  }
+                }
+              : {}
+          }
+          className={`nav-links ${sidebarOpen ? 'open' : ''}`}
+        >
+          <a href='#' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Home</li></a>
+          <a href='#' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>About</li></a>
+          <a href='#' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Loan details</li></a>
+          <a href='/login' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Login</li></a>
         </ul>
 
         <div className="search-box">
           <input type="text" placeholder="Search" />
-          <img src={theme === 'light' ? search_icon_light : search_icon_dark} alt="Search Icon" />
+          <img src={search_icon_light} alt="Search Icon" />
         </div>
 
-        <img onClick={toggleMode} src={theme === 'light' ? toggle_light : toggle_dark} alt="Toggle Theme" className='toggle-icon' />
+       
 
         <div className="menu-icon" onClick={toggleSidebar}>
-          {sidebarOpen ? <FaTimes /> : <FaBars />}
+          {sidebarOpen ? <FaTimes color={scrolled ? '#000' : '#fff'} /> : <FaBars color={scrolled ? '#000' : '#fff'} />}
         </div>
       </div>
 

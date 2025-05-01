@@ -45,14 +45,14 @@ const Loginpage = () => {
             <h1>Registration</h1>
             <div className="name-row">
               <div className="input-box half">
-              <input type="text" placeholder="First Name" required />
-              <FaUser className="icon" />
-            </div>
+                <input type="text" placeholder="First Name" required />
+                <FaUser className="icon" />
+              </div>
 
-            <div className="input-box half">
-              <input type="text" placeholder="Last Name" required />
-              <FaUser className="icon" />
-            </div>
+              <div className="input-box half">
+                <input type="text" placeholder="Last Name" required />
+                <FaUser className="icon" />
+              </div>
             </div>
 
             <div className="input-box">

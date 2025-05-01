@@ -17,7 +17,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow when scrolled */
 }
 .logo{
-    width: 40px;
+    width: 65px;
     cursor: pointer;
 }
 ul li {
@@ -128,15 +128,19 @@ ul li:hover::before {
         top: 0;
         left: -100%;
         flex-direction: column;
-        background: #fff;
-        width: 70%;
+        align-items: flex-start;
+        justify-content: flex-start;
+        
+        width: 270px;
         height: 100vh;
         padding-top: 80px;
         text-align: left;
         z-index: 10;
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     }
-
+    ul a {
+        color: #fff;
+    }
     .nav-links.open {
         left: 0;
     }
@@ -150,7 +154,7 @@ ul li:hover::before {
     }
 
     .navbar {
-        position: relative;
+        position: fixed;        
     }
 }
 
