@@ -85,7 +85,7 @@ export default class Design extends React.PureComponent {
               {(isHover || isMobile) && pointChild}
             </TweenOneGroup>
             <div className="page1-item-img" style={{ boxShadow: `0 16px 32px ${item.shadowColor}` }}>
-              <img src={item.src} alt="img" />
+              <img style={{width: "75px"}} src={item.src} alt="img" />
             </div>
             <div className="page1-item-title">{item.title}</div>
             <p>{item.content}</p>

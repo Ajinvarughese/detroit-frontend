@@ -127,7 +127,7 @@
   }
   &-item {
     text-align: center;
-    margin-top: 96px;
+    margin: 96px auto 0 auto;
     &-link {
       display: block;
       width: 180px;
@@ -143,6 +143,10 @@
       background: #fff;
       position: relative;
       z-index: 1;
+      transition: 0.2s ease;
+    }
+    &-img:hover {
+      transform: scale(1.1);
     }
     &-title {
       margin-top: 56px;

@@ -1,4 +1,8 @@
-
+import landscade from "../assets/page1-icons/landscape.png";
+import handshake from "../assets/page1-icons/handshake.png";
+import cloudy from "../assets/page1-icons/cloudy.png";
+import pawPrint from "../assets/page1-icons/paw-print.png";
+import chart from "../assets/page1-icons/chart.png";
 
 export const banner = [
   {
@@ -6,16 +10,16 @@ export const banner = [
     imgMobile: 'https://gw.alipayobjects.com/zos/rmsportal/ksMYqrCyhwQNdBKReFIU.svg',
     className: 'seeconf-wrap',  
     children: [
-      { children: 'Seeking Experience & Engineering Conference', className: 'seeconf-en-name' },
-      { children: '1st Ant Experience Technology Conference', className: 'seeconf-title', tag: 'h1' },
-      { children: 'Exploring Ultimate User Experience and Best Engineering Practices', className: 'seeconf-cn-name' },
+      { children: 'Detroit for Your Sustainable Loan', className: 'seeconf-en-name' },
+      { children: 'Category Based Loans for You', className: 'seeconf-title', tag: 'h1' },
+      { children: 'Explore Different Types of Loans and Choose the Most Suitable One for You', className: 'seeconf-cn-name' },
       {
         children: 'Learn More',
         className: 'banner-button',
         tag: 'button',
-        link: 'https://seeconf.alipay.com/',
+        link: '#',
       },
-      { children: '2018.01.06 / China · Hangzhou', className: 'seeconf-time' },
+      { children: 'Detroit - Ensure a Sustainable Future for Earth', className: 'seeconf-time' },
     ],
   },
   {
@@ -23,47 +27,63 @@ export const banner = [
     imgMobile: 'https://gw.alipayobjects.com/zos/rmsportal/ksMYqrCyhwQNdBKReFIU.svg',
     className: 'seeconf-wrap',
     children: [
-      { children: 'Seeking Experience & Engineering Conference', className: 'seeconf-en-name' },
-      { children: '1st Ant Experience Technology Conference', className: 'seeconf-title', tag: 'h1' },
-      { children: 'Exploring Ultimate User Experience and Best Engineering Practices', className: 'seeconf-cn-name' },
+      { children: 'Detroit for Your Sustainable Loan', className: 'seeconf-en-name' },
+      { children: 'Easy Loan Assesment', className: 'seeconf-title', tag: 'h1' },
+      { children: 'Get Your Loan Application Easy and Fast', className: 'seeconf-cn-name' },
       {
         children: 'Learn More',
         className: 'banner-button',
         tag: 'button',
-        link: 'https://seeconf.alipay.com/',
+        link: '#',
       },
-      { children: '2018.01.06 / China · Hangzhou', className: 'seeconf-time' },
+      { children: 'Detroit - Ensure a Sustainable Future for Earth', className: 'seeconf-time' },
     ],
   },
 ];
 
 export const page1 = {
-  title: 'PAGE 1 TITLE',
+  title: 'Loan Categories',
   children: [
     {
-      title: 'Design Values',
-      content: 'Design Values',
-      src: 'https://gw.alipayobjects.com/zos/rmsportal/KtRzkMmxBuWCVjPbBgRY.svg',
-      color: '#EB2F96',
+      title: 'Green Loans',
+      content: 'Green Loans',
+      src: landscade,
+      color: '#52C41A',
       shadowColor: 'rgba(166, 55, 112, 0.08)',
-      link: 'https://ant.design/docs/spec/values-cn',
+      link: '#',
     },
     {
-      title: 'Visual',
-      content: 'Visual',
-      src: 'https://gw.alipayobjects.com/zos/rmsportal/qIcZMXoztWjrnxzCNTHv.svg',
-      color: '#1890FF',
+      title: 'Social Loans',
+      content: 'Social Loans',
+      src: handshake,
+      color: '#ED5575', 
       shadowColor: 'rgba(15, 93, 166, 0.08)',
-      link: 'https://ant.design/docs/spec/colors-cn',
+      link: '#',
     },
     {
-      title: 'Visualisation',
-      content: 'Visualisation',
-      src: 'https://gw.alipayobjects.com/zos/rmsportal/eLtHtrKjXfabZfRchvVT.svg',
-      color: '#AB33F7',
+      title: 'Sustainability-Linked Loans (SLLs)',
+      content: 'Sustainability-Linked Loans (SLLs)',
+      src: chart,
+      color: '#722ED1',
       shadowColor: 'rgba(112, 73, 166, 0.08)',
-      link: 'https://antv.alipay.com/zh-cn/vis/index.html',
+      link: '#',
     },
+    {
+      title: 'Climate Adaptation Loans',
+      content: 'Climate Adaptation Loans',
+      src: cloudy,
+      color: '#237804',
+      shadowColor: 'rgba(166, 55, 112, 0.08)',
+      link: '#',
+    },
+    {
+      title: 'Biodiversity & Conservation Loans',
+      content: 'Biodiversity & Conservation Loans',
+      src: pawPrint,
+      color: '#FA8C16',
+      shadowColor: 'rgba(166, 55, 112, 0.08)',
+      link: '#',
+    }
   ],
 };
 

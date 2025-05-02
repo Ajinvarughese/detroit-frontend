@@ -8,7 +8,7 @@ import Page3 from './Page3';
 import Page4 from './Page4';
 import Footer from './Footer';
 import './static/style';
-import Landing from '../landing/Landing';
+import Landing from './Landing';
 
 
 let isMobile = false;
@@ -43,7 +43,7 @@ class Home extends React.PureComponent {
         <Page3 key="page3" isMobile={this.state.isMobile} />,
         <Page4 key="page4" />,
         <Footer key="footer" />,
-        <DocumentTitle title="Detroit - Make earth sustainable with us" key="title" />,
+        <DocumentTitle title="Detroit - Ensure a Sustainable Future for Earth" key="title" />,
       ]
     );
   }
