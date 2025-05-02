@@ -46,7 +46,7 @@ export const page1 = {
   children: [
     {
       title: 'Green Loans',
-      content: 'Green Loans',
+      content: 'Renewable energy, green buildings, energy efficiency, clean transportation.',
       src: landscade,
       color: '#52C41A',
       shadowColor: 'rgba(166, 55, 112, 0.08)',
@@ -54,7 +54,7 @@ export const page1 = {
     },
     {
       title: 'Social Loans',
-      content: 'Social Loans',
+      content: 'Affordable housing, education, healthcare, financial inclusion.',
       src: handshake,
       color: '#ED5575', 
       shadowColor: 'rgba(15, 93, 166, 0.08)',
@@ -62,7 +62,7 @@ export const page1 = {
     },
     {
       title: 'Sustainability-Linked Loans (SLLs)',
-      content: 'Sustainability-Linked Loans (SLLs)',
+      content: 'Emissions reduction targets, water usage efficiency, diversity goals.',
       src: chart,
       color: '#722ED1',
       shadowColor: 'rgba(112, 73, 166, 0.08)',
@@ -70,7 +70,7 @@ export const page1 = {
     },
     {
       title: 'Climate Adaptation Loans',
-      content: 'Climate Adaptation Loans',
+      content: 'Flood defenses, drought-resistant agriculture.',
       src: cloudy,
       color: '#237804',
       shadowColor: 'rgba(166, 55, 112, 0.08)',
@@ -78,7 +78,7 @@ export const page1 = {
     },
     {
       title: 'Biodiversity & Conservation Loans',
-      content: 'Biodiversity & Conservation Loans',
+      content: 'Reforestation, marine protection, wildlife conservation.',
       src: pawPrint,
       color: '#FA8C16',
       shadowColor: 'rgba(166, 55, 112, 0.08)',

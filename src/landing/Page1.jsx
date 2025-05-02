@@ -70,7 +70,6 @@ export default class Design extends React.PureComponent {
           <a
             className="page1-item-link"
             href={item.link}
-            target="_blank"
             onMouseEnter={() => { this.onMouseOver(i); }}
             onMouseLeave={this.onMouseOut}
           >
@@ -102,6 +101,9 @@ export default class Design extends React.PureComponent {
               {children}
             </QueueAnim>
           </OverPack>
+          <br />
+          <br />
+          <br />
         </div>
       </div>);
   }
