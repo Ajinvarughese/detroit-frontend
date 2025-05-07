@@ -1,27 +1,140 @@
 import React, { useState } from 'react';
 import './Loginpage.css';
-import { FaUser, FaLock, FaEnvelope, FaMapMarkerAlt, FaBuilding, FaBriefcase } from "react-icons/fa";
+import { FaUser, FaLock, FaEnvelope, FaMapMarkerAlt, FaBuilding, FaBriefcase, FaPhone, FaEyeDropper, FaEyeSlash, FaEye } from "react-icons/fa";
 
 const Loginpage = () => {
+  const [showPass, setShowPass] = useState(false)
   const [action, setAction] = useState('');
 
   const registerLink = () => setAction('active');
   const loginLink = () => setAction('');
 
+  // Registration form state
+  const [registerData, setRegisterData] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    password: '',
+    address: '',
+    organization: '',
+    role: '',
+    agreed: false
+  });
+
+  // Login form state
+  const [loginData, setLoginData] = useState({
+    email: '',
+    password: ''
+  });
+
+  const handleRegisterChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setRegisterData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleLoginChange = (e) => {
+    const { name, value } = e.target;
+    setLoginData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = {
+      fullName: registerData.firstName + " " + registerData.lastName,
+      phone: registerData.phone,
+      email: registerData.email,
+      password: registerData.password,
+      address: registerData.address,
+      organization: registerData.organization,
+      subRole: registerData.role
+    };
+    console.log(data)
+
+    try {
+      const response = await fetch('http://localhost:8080/api/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) throw new Error('Registration failed');
+      const result = await response.json();
+      console.log('Registration success:', result);
+    } catch (error) {
+      console.error('Registration error:', error);
+    }
+  };
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = {
+      email: loginData.email,
+      password: loginData.password
+    };
+    console.log(data)
+
+    try {
+      const response = await fetch('http://localhost:8080/api/user/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) throw new Error('Login failed');
+      const result = await response.json();
+      console.log('Login success:', result);
+    } catch (error) {
+      console.error('Login error:', error);
+    }
+  };
+
   return (
     <div className="container">
       <div className={`wrapper ${action}`}>
+        {/* Login Form */}
         <div className="form-box login">
-          <form>
+          <form onSubmit={handleLoginSubmit}>
             <h1>Login</h1>
             <div className="input-box">
-              <input type="text" placeholder="Username" required />
+              <input
+                type="text"
+                name="email"
+                placeholder="email"
+                required
+                value={loginData.email}
+                onChange={handleLoginChange}
+              />
               <FaUser className="icon" />
             </div>
 
             <div className="input-box">
-              <input type="password" placeholder="Password" required />
-              <FaLock className="icon" />
+              <input
+                type={showPass ? "text":"password"}
+                name="password"
+                placeholder="password"
+                required
+                value={loginData.password}
+                onChange={handleLoginChange}
+              />
+              <div 
+                onClick={()=> setShowPass(!showPass)}
+                style={{
+                  cursor : 'pointer'
+                }}
+              >
+                {
+                  showPass ?<FaEye className="icon" /> :<FaEyeSlash className="icon" /> 
+                }
+              </div>
             </div>
 
             <div className="remember-forgot">
@@ -30,7 +143,7 @@ const Loginpage = () => {
               </label>
               <a href="#">Forgot Password?</a>
             </div>
-            
+
             <button type="submit">Login</button>
             <div className="register-link">
               <p>
@@ -40,49 +153,130 @@ const Loginpage = () => {
             </div>
           </form>
         </div>
+
+        {/* Registration Form */}
         <div className="form-box register">
-          <form>
+          <form onSubmit={handleRegisterSubmit}>
             <h1>Registration</h1>
             <div className="name-row">
               <div className="input-box half">
-                <input type="text" placeholder="First Name" required />
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="First Name"
+                  required
+                  value={registerData.firstName}
+                  onChange={handleRegisterChange}
+                />
                 <FaUser className="icon" />
               </div>
 
               <div className="input-box half">
-                <input type="text" placeholder="Last Name" required />
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Last Name"
+                  required
+                  value={registerData.lastName}
+                  onChange={handleRegisterChange}
+                />
                 <FaUser className="icon" />
               </div>
             </div>
 
             <div className="input-box">
-              <input type="email" placeholder="Email" required />
+              <input
+                type="text"
+                name="phone"
+                placeholder="phone"
+                required
+                value={registerData.phone}
+                onChange={handleRegisterChange}
+              />
+              <FaPhone className="icon" />
+            </div>
+
+            <div className="input-box">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                required
+                value={registerData.email}
+                onChange={handleRegisterChange}
+              />
               <FaEnvelope className="icon" />
             </div>
 
             <div className="input-box">
-              <input type="password" placeholder="Password" required />
-              <FaLock className="icon" />
+              <input
+                type={showPass ? "text":"password"}
+                name="password"
+                placeholder="password"
+                required
+                value={registerData.password}
+                onChange={handleRegisterChange}
+              />
+              <div 
+                onClick={()=> setShowPass(!showPass)}
+                style={{
+                  cursor : 'pointer'
+                }}
+              >
+                {
+                  showPass ?<FaEye className="icon" /> :<FaEyeSlash className="icon" /> 
+                }
+              </div>
             </div>
-            
+
             <div className="input-box">
-              <input type="text" placeholder="Address" required />
+              <input
+                type="text"
+                name="address"
+                placeholder="Address"
+                required
+                value={registerData.address}
+                onChange={handleRegisterChange}
+              />
               <FaMapMarkerAlt className="icon" />
             </div>
 
             <div className="input-box">
-              <input type="text" placeholder="Organization" required />
+              <input
+                type="text"
+                name="organization"
+                placeholder="Organization"
+                value={registerData.organization}
+                onChange={handleRegisterChange}
+              />
               <FaBuilding className="icon" />
             </div>
 
             <div className="input-box">
-              <input type="text" placeholder="Business Name" required />
+              <select
+                name="role"
+                value={registerData.role}
+                onChange={handleRegisterChange}
+                required
+              >
+                <option value="">Select Role</option>
+                <option value="INDIVIDUAL">Individual</option>
+                <option value="ENTERPRISE">Enterprise</option>
+                <option value="GOVERNMENT">Government</option>
+              </select>
               <FaBriefcase className="icon" />
             </div>
 
+
             <div className="remember-forgot">
               <label>
-                <input type="checkbox" /> I agree to the terms & conditions
+                <input
+                  type="checkbox"
+                  name="agreed"
+                  checked={registerData.agreed}
+                  onChange={handleRegisterChange}
+                  required
+                /> I agree to the terms & conditions
               </label>
             </div>
 
@@ -93,9 +287,7 @@ const Loginpage = () => {
                 <a href="#" onClick={loginLink}>Login</a>
               </p>
             </div>
-
           </form>
-
         </div>
       </div>
     </div>
