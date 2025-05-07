@@ -1,5 +1,5 @@
 import 'rc-banner-anim/assets/index.css';
-import React from 'react';
+import React, { PureComponent, createElement } from 'react';
 import QueueAnim from 'rc-queue-anim';
 import BannerAnim from 'rc-banner-anim';
 import { Button } from 'antd';
@@ -8,7 +8,7 @@ import { banner } from './data';
 const { Element } = BannerAnim;
 const { BgElement } = Element;
 
-class Banner extends React.PureComponent {
+class Banner extends PureComponent {
   getDuration = (e) => {
     if (e.key === 'map') {
       return 800;
@@ -23,7 +23,7 @@ class Banner extends React.PureComponent {
         const childrenToRender = child.tag === 'button' ?
           <Button><a href={child.link} target="_blank">{child.children}</a></Button> :
           child.children;
-        return React.createElement(tag, {
+        return createElement(tag, {
           key: ii.toString(),
           className: child.className,
           style: child.style || {},

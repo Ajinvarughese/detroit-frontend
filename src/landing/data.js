@@ -3,6 +3,7 @@ import handshake from "../assets/page1-icons/handshake.png";
 import cloudy from "../assets/page1-icons/cloudy.png";
 import pawPrint from "../assets/page1-icons/paw-print.png";
 import chart from "../assets/page1-icons/chart.png";
+import detroit from "../assets/detroit.png"
 
 export const banner = [
   {
@@ -143,8 +144,8 @@ export const footer = [
     ],
   },
   {
-    title: 'Ant Experience Cloud',
-    icon: 'https://gw.alipayobjects.com/zos/rmsportal/wdarlDDcdCaVoCprCRwB.svg',
+    title: 'Detroit',
+    icon: detroit,
     children: [
       { title: 'Ant Design', desc: 'Ant UI System', link: 'https://ant.design' },
       { title: 'AntV', desc: 'Ant Data Visualization Solution', link: 'https://antv.alipay.com' },

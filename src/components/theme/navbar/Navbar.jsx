@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import './Navbar.css'
 import { FaBars, FaTimes } from 'react-icons/fa'
-
 import logo_light from '../../../assets/DETROIT.png'
 import search_icon_light from '../../../assets/search-w.png'
 
 
-const Navbar = () => {
+const Navbar = ({style, isDark = false }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)  // State to track scroll
+  const [scrolled, setScrolled] = useState(isDark)  // State to track scroll
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -41,7 +40,9 @@ const Navbar = () => {
 
   return (
     <>
-      <div className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+      <div style={{
+        ...style
+      }} className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <img src={logo_light} alt="Logo" className="logo" />
 
         <ul
@@ -58,7 +59,7 @@ const Navbar = () => {
           }
           className={`nav-links ${sidebarOpen ? 'open' : ''}`}
         >
-          <a href='#' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Home</li></a>
+          <a href='/' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Home</li></a>
           <a href='#' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>About</li></a>
           <a href='#' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Loan details</li></a>
           <a href='/login' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Login</li></a>

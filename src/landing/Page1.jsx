@@ -4,6 +4,7 @@ import { TweenOneGroup } from 'rc-tween-one';
 import OverPack from 'rc-scroll-anim/lib/ScrollOverPack';
 import { Row, Col } from 'antd';
 import { page1 } from './data';
+import { PureComponent } from 'react';
 
 const pointPos = [
   { x: -90, y: -20 },
@@ -15,7 +16,7 @@ const pointPos = [
   { x: 110, y: 50 },
 ];
 
-export default class Design extends React.PureComponent {
+export default class Design extends PureComponent {
   state = {
     hoverNum: null,
   }
