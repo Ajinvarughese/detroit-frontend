@@ -56,6 +56,7 @@ const Loginpage = () => {
       email: registerData.email,
       password: registerData.password,
       address: registerData.address,
+      role: "APPLICANT",
       organization: registerData.organization,
       subRole: registerData.role
     };
