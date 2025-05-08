@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import './Loginpage.css';
-import { FaUser, FaLock, FaEnvelope, FaMapMarkerAlt, FaBuilding, FaBriefcase, FaPhone, FaEyeDropper, FaEyeSlash, FaEye } from "react-icons/fa";
+import {
+  FaUser, FaLock, FaEnvelope, FaMapMarkerAlt,
+  FaBuilding, FaBriefcase, FaPhone,
+  FaEye, FaEyeSlash
+} from "react-icons/fa";
 
 const Loginpage = () => {
-  const [showPass, setShowPass] = useState(false)
+  const [showPass, setShowPass] = useState(false);
   const [action, setAction] = useState('');
 
   const registerLink = () => setAction('active');
   const loginLink = () => setAction('');
 
-  // Registration form state
   const [registerData, setRegisterData] = useState({
     firstName: '',
     lastName: '',
@@ -22,7 +26,6 @@ const Loginpage = () => {
     agreed: false
   });
 
-  // Login form state
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -56,20 +59,14 @@ const Loginpage = () => {
       organization: registerData.organization,
       subRole: registerData.role
     };
-    console.log(data)
 
     try {
-      const response = await fetch('http://localhost:8080/api/user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+      const response = await axios.post('http://localhost:8080/api/user', data, {
+        headers: { 'Content-Type': 'application/json' }
       });
-
-      if (!response.ok) throw new Error('Registration failed');
-      const result = await response.json();
-      console.log('Registration success:', result);
+      console.log('Registration success:', response.data);
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Registration error:', error.response?.data || error.message);
     }
   };
 
@@ -80,20 +77,14 @@ const Loginpage = () => {
       email: loginData.email,
       password: loginData.password
     };
-    console.log(data)
 
     try {
-      const response = await fetch('http://localhost:8080/api/user/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+      const response = await axios.post('http://localhost:8080/api/user/login', data, {
+        headers: { 'Content-Type': 'application/json' }
       });
-
-      if (!response.ok) throw new Error('Login failed');
-      const result = await response.json();
-      console.log('Login success:', result);
+      console.log('Login success:', response.data);
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login error:', error.response?.data || error.message);
     }
   };
 
@@ -118,22 +109,15 @@ const Loginpage = () => {
 
             <div className="input-box">
               <input
-                type={showPass ? "text":"password"}
+                type={showPass ? "text" : "password"}
                 name="password"
                 placeholder="password"
                 required
                 value={loginData.password}
                 onChange={handleLoginChange}
               />
-              <div 
-                onClick={()=> setShowPass(!showPass)}
-                style={{
-                  cursor : 'pointer'
-                }}
-              >
-                {
-                  showPass ?<FaEye className="icon" /> :<FaEyeSlash className="icon" /> 
-                }
+              <div onClick={() => setShowPass(!showPass)} style={{ cursor: 'pointer' }}>
+                {showPass ? <FaEye className="icon" /> : <FaEyeSlash className="icon" />}
               </div>
             </div>
 
@@ -146,10 +130,7 @@ const Loginpage = () => {
 
             <button type="submit">Login</button>
             <div className="register-link">
-              <p>
-                Don't have an account?{' '}
-                <a href="#" onClick={registerLink}>Register</a>
-              </p>
+              <p>Don't have an account? <a href="#" onClick={registerLink}>Register</a></p>
             </div>
           </form>
         </div>
@@ -170,7 +151,6 @@ const Loginpage = () => {
                 />
                 <FaUser className="icon" />
               </div>
-
               <div className="input-box half">
                 <input
                   type="text"
@@ -188,7 +168,7 @@ const Loginpage = () => {
               <input
                 type="text"
                 name="phone"
-                placeholder="phone"
+                placeholder="Phone"
                 required
                 value={registerData.phone}
                 onChange={handleRegisterChange}
@@ -210,22 +190,15 @@ const Loginpage = () => {
 
             <div className="input-box">
               <input
-                type={showPass ? "text":"password"}
+                type={showPass ? "text" : "password"}
                 name="password"
-                placeholder="password"
+                placeholder="Password"
                 required
                 value={registerData.password}
                 onChange={handleRegisterChange}
               />
-              <div 
-                onClick={()=> setShowPass(!showPass)}
-                style={{
-                  cursor : 'pointer'
-                }}
-              >
-                {
-                  showPass ?<FaEye className="icon" /> :<FaEyeSlash className="icon" /> 
-                }
+              <div onClick={() => setShowPass(!showPass)} style={{ cursor: 'pointer' }}>
+                {showPass ? <FaEye className="icon" /> : <FaEyeSlash className="icon" />}
               </div>
             </div>
 
@@ -267,7 +240,6 @@ const Loginpage = () => {
               <FaBriefcase className="icon" />
             </div>
 
-
             <div className="remember-forgot">
               <label>
                 <input
@@ -282,10 +254,7 @@ const Loginpage = () => {
 
             <button type="submit">Register</button>
             <div className="register-link">
-              <p>
-                Already have an account?{' '}
-                <a href="#" onClick={loginLink}>Login</a>
-              </p>
+              <p>Already have an account? <a href="#" onClick={loginLink}>Login</a></p>
             </div>
           </form>
         </div>
