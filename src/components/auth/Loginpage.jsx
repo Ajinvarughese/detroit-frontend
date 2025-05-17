@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './Loginpage.css';
 import {
-  FaUser, FaLock, FaEnvelope, FaMapMarkerAlt,
-  FaBuilding, FaBriefcase, FaPhone,
+  FaUser, FaEnvelope, FaMapMarkerAlt,
+  FaBuilding, FaPhone,
   FaEye, FaEyeSlash
 } from "react-icons/fa";
+import { saveUser } from '../hooks/LocalStorageUser';
 
-const Loginpage = () => {
+const Loginpage = ({user}) => {
   const [showPass, setShowPass] = useState(false);
   const [action, setAction] = useState('');
 
@@ -56,16 +57,20 @@ const Loginpage = () => {
       email: registerData.email,
       password: registerData.password,
       address: registerData.address,
-      role: "APPLICANT",
+      role: user,
       organization: registerData.organization,
       subRole: registerData.role
     };
+
+    console.log(data)
 
     try {
       const response = await axios.post('http://localhost:8080/api/user', data, {
         headers: { 'Content-Type': 'application/json' }
       });
       console.log('Registration success:', response.data);
+      saveUser(response.data);
+        
     } catch (error) {
       console.error('Registration error:', error.response?.data || error.message);
     }
@@ -73,18 +78,22 @@ const Loginpage = () => {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-
+    const role = window.location.pathname.split('/')[2].toUpperCase();
     const data = {
       email: loginData.email,
-      password: loginData.password
+      password: loginData.password,
+      role: role
     };
-
+    console.log(data)
     try {
       const response = await axios.post('http://localhost:8080/api/user/login', data, {
         headers: { 'Content-Type': 'application/json' }
       });
       console.log('Login success:', response.data);
+      saveUser(response.data);
+      window.location.href = '/';
     } catch (error) {
+      alert("Error occured during log in");
       console.error('Login error:', error.response?.data || error.message);
     }
   };
@@ -131,7 +140,7 @@ const Loginpage = () => {
 
             <button type="submit">Login</button>
             <div className="register-link">
-              <p>Don't have an account? <a href="#" onClick={registerLink}>Register</a></p>
+              <p>Don't have an account? <a style={{ cursor: 'pointer' }} onClick={registerLink}>Register</a></p>
             </div>
           </form>
         </div>
@@ -203,43 +212,66 @@ const Loginpage = () => {
               </div>
             </div>
 
-            <div className="input-box">
-              <input
-                type="text"
-                name="address"
-                placeholder="Address"
-                required
-                value={registerData.address}
-                onChange={handleRegisterChange}
-              />
-              <FaMapMarkerAlt className="icon" />
-            </div>
 
-            <div className="input-box">
-              <input
-                type="text"
-                name="organization"
-                placeholder="Organization"
-                value={registerData.organization}
-                onChange={handleRegisterChange}
-              />
-              <FaBuilding className="icon" />
-            </div>
-
-            <div className="input-box">
-              <select
-                name="role"
-                value={registerData.role}
-                onChange={handleRegisterChange}
-                required
-              >
-                <option value="">Select Role</option>
-                <option value="INDIVIDUAL">Individual</option>
-                <option value="ENTERPRISE">Enterprise</option>
-                <option value="GOVERNMENT">Government</option>
-              </select>
-              <FaBriefcase className="icon" />
-            </div>
+            {
+              user === "APPLICANT" ? 
+              (
+                <>
+                  <div className="input-box">
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Address"
+                      required
+                      value={registerData.address}
+                      onChange={handleRegisterChange}
+                    />
+                    <FaMapMarkerAlt className="icon" />
+                  </div>
+                  <div className="input-box">
+                    <input
+                      type="text"
+                      name="organization"
+                      placeholder="Organization"
+                      value={registerData.organization}
+                      onChange={handleRegisterChange}
+                    />
+                    <FaBuilding className="icon" />
+                  </div>
+                  <div className="input-box">
+                    <select
+                      name="role"
+                      value={registerData.role}
+                      onChange={handleRegisterChange}
+                      required
+                    >
+                      <option value="">Select Role</option>
+                      <option value="ENTERPRISE">Enterprise</option>
+                      <option value="GOVERNMENT">Government</option>
+                    </select>
+                  </div>
+                </>
+              )
+              :
+                user == "BANK" &&  
+                (
+                <div className="input-box">
+                  <select
+                    name="role"
+                    value={registerData.role}
+                    onChange={handleRegisterChange}
+                    required
+                  >
+                    <option value="">Select Role</option>
+                    <option value="QUESTIONNAIRE_SERVICE">Questionnaire</option>
+                    <option value="SF_SERVICE">Sustainable Finance</option>
+                    <option value="RULE_SERVICE">Rule</option>
+                  </select>
+                  
+                </div>
+              )
+              
+            }
 
             <div className="remember-forgot">
               <label>
@@ -255,7 +287,7 @@ const Loginpage = () => {
 
             <button type="submit">Register</button>
             <div className="register-link">
-              <p>Already have an account? <a href="#" onClick={loginLink}>Login</a></p>
+              <p>Already have an account? <a style={{ cursor: 'pointer' }} onClick={loginLink}>Login</a></p>
             </div>
           </form>
         </div>

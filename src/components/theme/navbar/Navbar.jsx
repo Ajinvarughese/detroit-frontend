@@ -3,9 +3,53 @@ import './Navbar.css'
 import { FaBars, FaTimes } from 'react-icons/fa'
 import logo_light from '../../../assets/DETROIT.png'
 import search_icon_light from '../../../assets/search-w.png'
+import { deleteUser, getUser } from '../../hooks/LocalStorageUser'
 
 
 const Navbar = ({style, isDark = false }) => {
+
+  const navList = {
+    guest: [
+      {
+        name: 'Home',
+        link: '/'
+      },
+    ],
+    applicant: [
+      {
+        name: 'Home',
+        link: '/'
+      },
+      {
+        name: 'Loan details',
+        link: '/loans'
+      },
+    ],
+    bank: [
+      {
+        name: 'Questionnaire',
+        link: '/questionnaire/home',
+      },
+      {
+        name: 'SF',
+      link: '/sf'
+      },
+      {
+        name: 'Rules',
+        link: '/rules'
+      },
+    ]
+  }
+  
+  const user = getUser('user');
+  var mapUser = navList.guest;
+  if(user.role === 'BANK') {
+    mapUser = navList.bank;
+  }else if(user.role === 'APPLICANT') {
+    mapUser = navList.applicant;
+  }
+
+
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [scrolled, setScrolled] = useState(isDark)  // State to track scroll
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -59,10 +103,43 @@ const Navbar = ({style, isDark = false }) => {
           }
           className={`nav-links ${sidebarOpen ? 'open' : ''}`}
         >
-          <a href='/' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Home</li></a>
-          <a href='#' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>About</li></a>
-          <a href='#' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Loan details</li></a>
-          <a href='/login' style={isMobile && scrolled ? { color: '#000' } : {}}><li onClick={toggleSidebar}>Login</li></a>
+          {
+            mapUser.map((item, i) => (
+              <a href={item.link} style={isMobile && scrolled ? { color: '#000' } : {}}>
+                <li onClick={toggleSidebar}>{item.name}</li>
+              </a>
+            ))
+          }
+          {
+            user.role === "BANK" || user.role === "APPLICANT" ? 
+              (
+                <li style={scrolled ? { color: '#000' } : {color: "#fff"}} className="dropdown-toggle" 
+                  onClick={() => {
+                    toggleSidebar
+                    deleteUser();
+                    window.location.reload();
+                  }
+                }>
+                  Logout
+                </li>
+              )
+            : 
+            (
+              <div
+                className="dropdown"
+                style={scrolled ? { color: '#000' } : {color: "#fff"}}
+              >
+                <li className="dropdown-toggle">
+                  Login ▾
+                </li>
+                <ul className="dropdown-menu">
+                  <a href="/login/applicant"><li onClick={toggleSidebar}>Applicant</li></a>
+                  <a href="/login/bank"><li onClick={toggleSidebar}>Bank</li></a>
+                </ul>
+              </div>
+            )
+          }
+
         </ul>
 
         <div className="search-box">
