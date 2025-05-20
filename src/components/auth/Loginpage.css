@@ -1,161 +1,54 @@
+/* Container */
 .container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: url(../../assets/background.jpg)
-    no-repeat;
-    background-size:cover;
+    background: url(../../assets/background.jpg) no-repeat;
+    background-size: cover;
     background-position: center;
-}
-.wrapper {
+  }
+  
+  /* Wrapper for all forms */
+  .wrapper {
     width: 400px;
-    height: auto;
-    min-height: 500px;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(25px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    color: #fff;
     border-radius: 20px;
     padding: 40px 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow: hidden;
-    position: relative;
+    color: #fff;
     transition: all 0.4s ease;
-}
-
-.wrapper.active {
-    width: 600px; 
-    height: auto;
-    min-height: 580px;
-}
-.name-row {
-    display: flex;
-    gap: 12px;
-}
-@media (max-width: 600px) {
-    .name-row {
-        display: block;
-    }
-    .wrapper, .wrapper.active {
-        width: 90%;
-        padding: 30px 20px;
-    }
-}
-
-.wrapper .form-box {
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 40px 30px;
-    transition: transform 0.4s ease;
-}
-
-.wrapper .form-box.login {
-    transform: translateX(0);
-}
-
-.wrapper.active .form-box.login {
-    transform: translateX(-100%);
-}
-
-.wrapper .form-box.register {
-    transform: translateX(100%);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.wrapper.active .form-box.register {
-    transform: translateX(0);
-}
-
-.wrapper .form-box.register form {
-    flex: 1;
-    overflow-y: auto;
-    max-height: 500px; 
-    padding-right: 10px; 
-}
-
-.wrapper .form-box.register form::-webkit-scrollbar {
-    width: 6px;
-}
-.wrapper .form-box.register form::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 20px;
-}
-.wrapper .form-box.register form::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.register-layout {
-    display: flex;
-    width: 100%;
-    height: 100%;
+    position: relative;
     overflow: hidden;
-}
-
-.register-sidebar {
-    width: 140px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    border-right: 2px solid rgba(255, 255, 255, 0.2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 10px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.register-sidebar h2 {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #fff;
-}
-
-.register-sidebar p {
-    font-size: 12px;
-    color: #ddd;
-}
-
-.register-content {
-    flex: 1;
-    padding: 20px 25px;
-    overflow-y: auto;
-    max-height: 500px;
-}
-
-.register-content::-webkit-scrollbar {
-    width: 6px;
-}
-.register-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-}
-.register-content::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-form h1 {
+  }
+  
+  .wrapper.active {
+    width: 600px;
+  }
+  
+  /* Form title */
+  form h1,
+  h2 {
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 30px;
     text-align: center;
-}
-
-.input-box {
+  }
+  
+  /* Input box */
+  .input-box {
     position: relative;
     width: 100%;
     margin-bottom: 20px;
-}
-
-.input-box input {
+  }
+  
+  .input-box input,
+  .input-box select {
     width: 100%;
     height: 45px;
     padding: 0 45px 0 15px;
@@ -166,47 +59,67 @@ form h1 {
     color: #fff;
     outline: none;
     transition: background 0.3s;
-}
-
-.input-box input::placeholder {
+  }
+  
+  .input-box input::placeholder,
+  .input-box select {
     color: #eee;
-}
-
-.input-box .icon {
+  }
+  
+  .input-box .icon {
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 16px;
     color: #fff;
-}
-
-.input-box input:focus {
+    pointer-events: none;
+  }
+  
+  .input-box input:focus,
+  .input-box select:focus {
     background: rgba(255, 255, 255, 0.2);
-}
-
-.remember-forgot {
+  }
+  
+  /* Select styling */
+  .input-box select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23ffffff' d='M1.41.59L6 5.17l4.59-4.58L12 2l-6 6-6-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px 8px;
+  }
+  
+  .input-box select option {
+    background: #fff;
+    color: #000;
+  }
+  
+  /* Form bottom actions */
+  .remember-forgot {
     display: flex;
     justify-content: space-between;
     font-size: 13px;
     margin: 15px 0 20px;
-}
-
-.remember-forgot label input {
+  }
+  
+  .remember-forgot label input {
     accent-color: #fff;
     margin-right: 5px;
-}
-
-.remember-forgot a {
+  }
+  
+  .remember-forgot a {
     color: #fff;
     text-decoration: none;
-}
-
-.remember-forgot a:hover {
+    cursor: pointer;
+  }
+  
+  .remember-forgot a:hover {
     text-decoration: underline;
-}
-
-.wrapper button {
+  }
+  
+  /* Button */
+  .wrapper button {
     width: 100%;
     height: 45px;
     background: linear-gradient(135deg, #ffffff, #dcdcdc);
@@ -218,53 +131,82 @@ form h1 {
     font-size: 16px;
     margin-top: 10px;
     transition: background 0.3s;
-}
-
-.wrapper button:hover {
+  }
+  
+  .wrapper button:hover {
     background: linear-gradient(135deg, #eeeeee, #cccccc);
-}
-
-.register-link {
+  }
+  
+  /* Register/Login link */
+  .register-link {
     margin-top: 20px;
     font-size: 13px;
     text-align: center;
-}
-
-.register-link p a {
+  }
+  
+  .register-link p a {
     color: #fff;
     font-weight: 600;
     text-decoration: none;
-}
-
-.register-link p a:hover {
+    cursor: pointer;
+  }
+  
+  .register-link p a:hover {
     text-decoration: underline;
-}
-
-.input-box select {
+  }
+  
+  /* Forgot Password Styling */
+  .forgot-password-box {
     width: 100%;
-    height: 45px;
-    padding: 0 45px 0 15px;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: 30px;
-    font-size: 14px;
+    text-align: center;
     color: #fff;
-    outline: none;
-    appearance: none; /* Removes default arrow styling */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23ffffff' d='M1.41.59L6 5.17l4.59-4.58L12 2l-6 6-6-6z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 12px 8px;
-}
-
-.input-box select:focus {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.input-box select option {
-    color: #000;
-    background: #fff;
-}
-
+  }
+  
+  .forgot-password-box .input-box {
+    margin-top: 20px;
+  }
+  
+  .success-message {
+    color: #4CAF50;
+    margin: 15px 0;
+  }
+  
+  .error-message {
+    color: #FF5252;
+    margin: 15px 0;
+  }
+  
+  .back-to-login {
+    margin-top: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #fff;
+    text-decoration: underline;
+  }
+  
+  .back-to-login:hover {
+    color: #ddd;
+  }
+  
+  /* Registration Layout */
+  .name-row {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .input-box.half {
+    width: 100%;
+  }
+  
+  @media (max-width: 600px) {
+    .wrapper, .wrapper.active {
+      width: 90%;
+      padding: 30px 20px;
+    }
+  
+    .name-row {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+  
