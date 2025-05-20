@@ -2,8 +2,9 @@ import './App.css'
 import Landing from './landing/index'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import Loginpage from './components/auth/Loginpage'
-import QuestionnaireMaker from './components/questionnaire/questionnaireMaker'
+import QuestionnaireEditor from './components/questionnaire/editor/QuestionnaireEditor'
 import { getUser } from './components/hooks/LocalStorageUser'
+import Questionnaire from "./components/questionnaire/Questionnaire.jsx";
 
 function App() {
 
@@ -13,7 +14,8 @@ function App() {
     {
       getUser('user').role === "BANK"  &&
       <Routes>
-        <Route path='/questionnaire/home' element={<QuestionnaireMaker />} />
+        <Route path='/questionnaire/editor/:id' element={<QuestionnaireEditor />} />
+        <Route path='/questionnaire' element={<Questionnaire />} />
       </Routes>
     }
     {

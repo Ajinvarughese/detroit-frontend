@@ -28,13 +28,12 @@ export function AuthProvider({ children }) {
     saveUser(response.data);
     setUser(response.data);
   } catch (error) {
-    if (error.code === 'ECONNREFUSED' || error.message.includes('ERR_CONNECTION_REFUSED')) {
-      console.log("Backend not available: " + error.message);
-    } else {
+    if (error.status === 500) {
       deleteUser();
       setUser(null);
       console.log("Login error: " + error.message);
     }
+    console.log("Error: "+error.message);
   }
 };
 

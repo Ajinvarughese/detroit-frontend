@@ -6,7 +6,7 @@ import search_icon_light from '../../../assets/search-w.png'
 import { deleteUser, getUser } from '../../hooks/LocalStorageUser'
 
 
-const Navbar = ({style, isDark = false }) => {
+const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
 
   const navList = {
     guest: [
@@ -28,7 +28,7 @@ const Navbar = ({style, isDark = false }) => {
     bank: [
       {
         name: 'Questionnaire',
-        link: '/questionnaire/home',
+        link: '/questionnaire',
       },
       {
         name: 'SF',
@@ -88,16 +88,14 @@ const Navbar = ({style, isDark = false }) => {
         ...style
       }} className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <img src={logo_light} alt="Logo" className="logo" />
-
         <ul
+        
           style={
             isMobile
               ? {
                   background: scrolled ? '#fff' : 'transparent',
                   backdropFilter: 'blur(15px)',
-                  '&a': {
-                    color: scrolled ? '#000' : '#fff',
-                  }
+                  
                 }
               : {}
           }
@@ -105,15 +103,15 @@ const Navbar = ({style, isDark = false }) => {
         >
           {
             mapUser.map((item, i) => (
-              <a href={item.link} style={isMobile && scrolled ? { color: '#000' } : {}}>
+              <a href={item.link} style={style.position == "relative" ? { color: '#000' } : isMobile ? scrolled ? {color: "#000"} : {color: '#fff'} : scrolled ? { color: '#000' } : {color: "#fff"}}>
                 <li onClick={toggleSidebar}>{item.name}</li>
               </a>
             ))
           }
           {
-            user.role === "BANK" || user.role === "APPLICANT" ? 
+            user.role ? 
               (
-                <li style={scrolled ? { color: '#000' } : {color: "#fff"}} className="dropdown-toggle" 
+                <li style={scrolled || style.position == "relative" ? { color: '#000' } : {color: "#fff"}} className="dropdown-toggle" 
                   onClick={() => {
                     toggleSidebar
                     deleteUser();
