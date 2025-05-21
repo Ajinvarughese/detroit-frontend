@@ -21,6 +21,18 @@ const QUESTION_TYPES = {
     Dropdown: "DROPDOWN",
 };
 
+const styles = {
+    input: {
+        '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+            WebkitAppearance: 'none',
+            margin: 0,
+        },
+        '& input[type=number]': {
+            MozAppearance: 'textfield',
+        }
+    }
+};
+
 const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
     const [question, setQuestion] = useState(questionData?.questionText || "Untitled Question");
     const [questionType, setQuestionType] = useState(questionData?.questionType || "RADIO");
@@ -29,27 +41,35 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
     const hasFetchedRef = useRef(false);
 
     const fetchOptions = async () => {
-        if (hasFetchedRef.current) return;
+        if (hasFetchedRef.current || !questionData.id) return;
         hasFetchedRef.current = true;
 
         try {
             const res = await axios.get(`http://localhost:8080/api/choices/question/${questionData.id}`);
             let fetchedOptions = res.data.map(choice => ({
                 id: choice.id,
-                choiceText: choice.choiceText
+                choiceText: choice.choiceText,
+                score: choice.score
             }));
 
-            if (fetchedOptions.length === 0 && options.length === 0) {
+            if (fetchedOptions.length === 0) {
                 const payload = {
                     question: { id: questionData.id },
-                    choiceText: "Option 1"
-                }
+                    choiceText: "Option 1",
+                    score: 0
+                };
 
-                const res = await axios.post("http://localhost:8080/api/choices", payload, {
+                const created = await axios.post("http://localhost:8080/api/choices", payload, {
                     headers: { "Content-Type": "application/json" },
                 });
-                fetchedOptions = [{ id: res.data.id, choiceText: res.data.choiceText }];
+
+                fetchedOptions = [{
+                    id: created.data.id,
+                    choiceText: created.data.choiceText,
+                    score: created.data.score
+                }];
             }
+
             setOptions(fetchedOptions);
         } catch (error) {
             console.error("Error fetching/creating default options:", error);
@@ -57,10 +77,12 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
     };
 
     useEffect(() => {
-        if(questionData.id) fetchOptions();
-    }, [questionData.id]);
+        if (questionData?.id) fetchOptions();
+    }, [questionData?.id]);
 
     const handleSave = async () => {
+        if (!questionData?.id) return;
+
         try {
             const questionPayload = {
                 questionnaire: { id: questionnaireId },
@@ -69,20 +91,23 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
                 questionText: question,
                 questionType: questionType,
             };
+
             await axios.put("http://localhost:8080/api/question", questionPayload, {
                 headers: { "Content-Type": "application/json" },
             });
 
             await Promise.all(options.map(async (choice) => {
+                if (!choice.choiceText?.trim()) return;
                 const payload = {
                     question: { id: questionData.id },
-                    choiceText: choice.choiceText
+                    choiceText: choice.choiceText.trim(),
+                    score: Number(choice.score) || 0,
+                    id: choice.id
                 };
 
-                await axios.put("http://localhost:8080/api/choices", { ...payload, id: choice.id }, {
+                await axios.put("http://localhost:8080/api/choices", payload, {
                     headers: { "Content-Type": "application/json" },
                 });
-                
             }));
         } catch (error) {
             console.error("Auto-save failed:", error);
@@ -90,28 +115,33 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
     };
 
     useEffect(() => {
+        if (!questionData?.id || !options.length) return;
         if (debounceTimer.current) clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(handleSave, 1500);
         return () => clearTimeout(debounceTimer.current);
     }, [question, questionType, options]);
 
-    const handleOptionChange = (index, value) => {
+    const handleOptionChange = (index, value, isScore = false) => {
         const updated = [...options];
-        updated[index].choiceText = value;
+        if (isScore) {
+            updated[index].score = value;
+        } else {
+            updated[index].choiceText = value;
+        }
         setOptions(updated);
     };
-
 
     const addOption = async () => {
         try {
             const payload = {
                 question: { id: questionData.id },
-                choiceText: `Option ${options.length + 1}`
+                choiceText: `Option ${options.length + 1}`,
+                score: 0
             };
             const res = await axios.post("http://localhost:8080/api/choices", payload, {
                 headers: { "Content-Type": "application/json" },
             });
-            setOptions([...options, { id: res.data.id, choiceText: res.data.choiceText }]);
+            setOptions([...options, { id: res.data.id, choiceText: res.data.choiceText, score: res.data.score }]);
         } catch (error) {
             console.error("Failed to add option:", error);
         }
@@ -134,7 +164,7 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
             null;
 
         return (
-            <Box key={option.id} sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+            <Box key={option.id || index} sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                 {InputControl && <InputControl disabled />}
                 <TextField
                     variant="outlined"
@@ -142,6 +172,22 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
                     value={option.choiceText}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                     sx={{ flex: 1, mr: 1 }}
+                />
+                <TextField
+                    variant="outlined"
+                    type="number"
+                    value={option.score}
+                    label="score"
+                    onChange={(e) => handleOptionChange(index, e.target.value, true)}
+                    InputProps={{
+                        inputProps: {
+                            style: { width: 50, MozAppearance: 'textfield' },
+                            inputMode: "numeric",
+                            pattern: "[0-9]*",
+                            step: "any",
+                        },
+                    }}
+                    sx={{ ...styles.input, flex: 1, maxWidth: "10%", minWidth: "70px", mr: 1 }}
                 />
                 <IconButton onClick={() => removeOption(index)}>
                     <Delete />

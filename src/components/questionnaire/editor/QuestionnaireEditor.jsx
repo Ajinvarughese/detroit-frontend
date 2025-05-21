@@ -28,6 +28,8 @@ const QuestionnaireEditor = () => {
     const [questions, setQuestions] = useState([]);
     const [showTemplates, setShowTemplates] = useState(false);
 
+    const [isLoading, setIsLoading] = useState(false);
+
     // Fetch Questionnaire Info
     useEffect(() => {
         const fetchQuestionnaire = async () => {
@@ -82,18 +84,19 @@ const QuestionnaireEditor = () => {
 
     // Save questionnaire
     const handleSave = async () => {
+        setIsLoading(true);
         const updated = {
             id: questionnaireData.id,
             title,
             description,
             loanCategory: selectedLoanCategory,
         };
-        console.log("Updated:", updated);
         try {
-            const response = await axios.put(`http://localhost:8080/api/questionnaire`, updated);
-            console.log("Saved:", response.data);
+            await axios.put(`http://localhost:8080/api/questionnaire`, updated);
         } catch (error) {
             console.error("Failed to save questionnaire:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -169,8 +172,9 @@ const QuestionnaireEditor = () => {
                     Questionnaire Form
                 </Typography>
                 <Box sx={{ flexGrow: 1 }} />
-                <Button variant="contained" onClick={handleSave}>Save</Button>
-                <Button variant="contained">Publish</Button>
+                <Button loading={isLoading} disabled={isLoading} variant="outlined" onClick={handleSave}>Save</Button>
+
+                <Button disabled={isLoading} sx={{ ml: 2 }} variant="contained">Publish</Button>
             </Box>
 
             {/* Templates Dropdown */}
