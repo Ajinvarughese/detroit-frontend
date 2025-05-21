@@ -13,8 +13,11 @@ import Form from "../form/Form.jsx";
 import { useParams } from "react-router";
 import axios from "axios";
 import { Select } from "antd";
+import { useNavigate } from "react-router";
 
 const QuestionnaireEditor = () => {
+    const navigate = useNavigate();
+
     const debounceTimer = useRef(null);
     const { id } = useParams();
     const [questionnaireData, setQuestionnaireData] = useState(null);
@@ -35,7 +38,7 @@ const QuestionnaireEditor = () => {
                 setDescription(res.data.description);
                 setSelectedLoanCategory(res.data.loanCategory);
             } catch (error) {
-                console.error("Error fetching questionnaire:", error);
+                navigate("/questionnaire");
             }
         };
         fetchQuestionnaire();
@@ -125,8 +128,9 @@ const QuestionnaireEditor = () => {
     };
 
     // Remove question locally
-    const removeQuestion = (questionUUID) => {
-        setQuestions(prev => prev.filter(q => q.questionUUID !== questionUUID));
+    const removeQuestion = async (questionData) => {
+        setQuestions(prev => prev.filter(q => q.questionUUID !== questionData.questionUUID));
+        await axios.delete(`http://localhost:8080/api/question/${questionData.id}`);
     };
 
     return (
@@ -158,7 +162,7 @@ const QuestionnaireEditor = () => {
                     alignItems: "center",
                 }}
             >
-                <IconButton onClick={() => window.location.href = "/"} sx={{ color: "#2D2D2D" }}>
+                <IconButton onClick={() => navigate("/questionnaire")} sx={{ color: "#2D2D2D" }}>
                     <Home fontSize="large" />
                 </IconButton>
                 <Typography variant="inherit" sx={{ ml: 2 }}>
@@ -243,17 +247,24 @@ const QuestionnaireEditor = () => {
                 />
 
                 <Select
-                    style={{ width: "100%", marginTop: "1.5rem"}}
+                    style={{ width: "100%", marginTop: "1.5rem" }}
                     placeholder="Select Loan Category"
                     value={selectedLoanCategory}
                     onChange={setSelectedLoanCategory}
                 >
                     {loanCategoryOptions.map((category) => (
                         <Select.Option style={{ padding: '15px 2px 15px 15px' }} key={category} value={category}>
-                            {category}
+                            {
+                                category
+                                    .toLowerCase()
+                                    .split('_')
+                                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                    .join(' ')
+                            }
                         </Select.Option>
                     ))}
                 </Select>
+
             </Box>
 
             {/* Questions */}
@@ -270,7 +281,7 @@ const QuestionnaireEditor = () => {
                             questionCount={index + 1}
                             questionData={q}
                             questionnaireId={q.questionnaire?.id}
-                            onDelete={() => removeQuestion(q.questionUUID)}
+                            onDelete={() => removeQuestion(q)}
                         />
                     </motion.div>
                 ))}

@@ -26,39 +26,38 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
     const [questionType, setQuestionType] = useState(questionData?.questionType || "RADIO");
     const [options, setOptions] = useState([]);
     const debounceTimer = useRef(null);
+    const hasFetchedRef = useRef(false);
 
-    // Fetch options from DB or add default one
-    useEffect(() => {
-        const fetchOptions = async () => {
-            try {
-                const res = await axios.get(`http://localhost:8080/api/choices/question/${questionData.id}`);
-                let fetchedOptions = res.data.map(choice => ({
-                    id: choice.id,
-                    choiceText: choice.choiceText
-                }));
+    const fetchOptions = async () => {
+        if (hasFetchedRef.current) return;
+        hasFetchedRef.current = true;
 
-                // If no options found, create Option 1 in DB
-                if (fetchedOptions.length === 0) {
-                    const defaultPayload = {
-                        question: { id: questionData.id },
-                        choiceText: "Option 1"
-                    };
-                    const defaultRes = await axios.post("http://localhost:8080/api/choices", defaultPayload, {
-                        headers: { "Content-Type": "application/json" },
-                    });
-                    fetchedOptions = [{
-                        id: defaultRes.data.id,
-                        choiceText: defaultRes.data.choiceText
-                    }];
+        try {
+            const res = await axios.get(`http://localhost:8080/api/choices/question/${questionData.id}`);
+            let fetchedOptions = res.data.map(choice => ({
+                id: choice.id,
+                choiceText: choice.choiceText
+            }));
+
+            if (fetchedOptions.length === 0 && options.length === 0) {
+                const payload = {
+                    question: { id: questionData.id },
+                    choiceText: "Option 1"
                 }
 
-                setOptions(fetchedOptions);
-            } catch (error) {
-                console.error("Error fetching/creating default options:", error);
+                const res = await axios.post("http://localhost:8080/api/choices", payload, {
+                    headers: { "Content-Type": "application/json" },
+                });
+                fetchedOptions = [{ id: res.data.id, choiceText: res.data.choiceText }];
             }
-        };
+            setOptions(fetchedOptions);
+        } catch (error) {
+            console.error("Error fetching/creating default options:", error);
+        }
+    };
 
-        if (questionData.id) fetchOptions();
+    useEffect(() => {
+        if(questionData.id) fetchOptions();
     }, [questionData.id]);
 
     const handleSave = async () => {
@@ -80,12 +79,10 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
                     choiceText: choice.choiceText
                 };
 
-                if (typeof choice.id === "number") {
-                    // Update existing choice
-                    await axios.put("http://localhost:8080/api/choices", { ...payload, id: choice.id }, {
-                        headers: { "Content-Type": "application/json" },
-                    });
-                }
+                await axios.put("http://localhost:8080/api/choices", { ...payload, id: choice.id }, {
+                    headers: { "Content-Type": "application/json" },
+                });
+                
             }));
         } catch (error) {
             console.error("Auto-save failed:", error);
@@ -103,6 +100,7 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
         updated[index].choiceText = value;
         setOptions(updated);
     };
+
 
     const addOption = async () => {
         try {
