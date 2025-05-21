@@ -37,12 +37,13 @@ function Questionnaire() {
         formResponse();
     }, []);
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setCreating(true); // NEW
         const questionnaireParms = {
             formUrlId: uuidv4(),
-            title: "Untitled Thingyy",
-            description: "Form description Thingyy",
+            title: "Untitled Form",
+            description: "Form description",
         };
         try {
             const response = await axios.post("http://localhost:8080/api/questionnaire", questionnaireParms, {
@@ -54,17 +55,16 @@ function Questionnaire() {
                 questionnaire: {
                     id: response.data.id,
                 },
-                questionText: "This one is an issue",
+                questionText: "Untitled Question",
                 questionType: "CHECKBOX",
                 questionUUID: uuidv4(),
             }
-            const questionResponse = await axios.post("http://localhost:8080/api/question", questionParms, {
+            await axios.post("http://localhost:8080/api/question", questionParms, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            });
-            console.log(questionResponse.data);
-            navigate("/questionnaire/editor/" + response.data.formUrlId);
+            })
+            navigate("/questionnaire/editor/" + response.data.formUrlId);   
         } catch (error) {
             console.error("Error posting data:", error);
             setCreating(false); // Hide on error

@@ -24,32 +24,69 @@ const QUESTION_TYPES = {
 const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
     const [question, setQuestion] = useState(questionData?.questionText || "Untitled Question");
     const [questionType, setQuestionType] = useState(questionData?.questionType || "RADIO");
-    const [options, setOptions] = useState(questionData?.choices || ["Option 1"]);
-
+    const [options, setOptions] = useState([]);
     const debounceTimer = useRef(null);
+
+    // Fetch options from DB or add default one
+    useEffect(() => {
+        const fetchOptions = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8080/api/choices/question/${questionData.id}`);
+                let fetchedOptions = res.data.map(choice => ({
+                    id: choice.id,
+                    choiceText: choice.choiceText
+                }));
+
+                // If no options found, create Option 1 in DB
+                if (fetchedOptions.length === 0) {
+                    const defaultPayload = {
+                        question: { id: questionData.id },
+                        choiceText: "Option 1"
+                    };
+                    const defaultRes = await axios.post("http://localhost:8080/api/choices", defaultPayload, {
+                        headers: { "Content-Type": "application/json" },
+                    });
+                    fetchedOptions = [{
+                        id: defaultRes.data.id,
+                        choiceText: defaultRes.data.choiceText
+                    }];
+                }
+
+                setOptions(fetchedOptions);
+            } catch (error) {
+                console.error("Error fetching/creating default options:", error);
+            }
+        };
+
+        if (questionData.id) fetchOptions();
+    }, [questionData.id]);
 
     const handleSave = async () => {
         try {
-            const payload = {
-                questionnaire: {
-                    id: questionnaireId
-                },
+            const questionPayload = {
+                questionnaire: { id: questionnaireId },
                 id: questionData.id,
                 questionUUID: questionData.questionUUID,
-                questionText: questionData.questionText,
-                questionType: questionData.questionType,
+                questionText: question,
+                questionType: questionType,
             };
-            console.log("Saving to /api/question/questionnaire:", payload);
-            const res = await axios.put("http://localhost:8080/api/question", payload, {
+            await axios.put("http://localhost:8080/api/question", questionPayload, {
                 headers: { "Content-Type": "application/json" },
             });
-            console.log(res);
 
-            // await axios.put("http://localhost:8080/api/choices", , {
-            //     headers: { "Content-Type": "application/json" },
-            // });
+            await Promise.all(options.map(async (choice) => {
+                const payload = {
+                    question: { id: questionData.id },
+                    choiceText: choice.choiceText
+                };
 
-            console.log("Auto-saved to /api/choices:", payload);
+                if (typeof choice.id === "number") {
+                    // Update existing choice
+                    await axios.put("http://localhost:8080/api/choices", { ...payload, id: choice.id }, {
+                        headers: { "Content-Type": "application/json" },
+                    });
+                }
+            }));
         } catch (error) {
             console.error("Auto-save failed:", error);
         }
@@ -57,46 +94,54 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
 
     useEffect(() => {
         if (debounceTimer.current) clearTimeout(debounceTimer.current);
-
-        debounceTimer.current = setTimeout(() => {
-            handleSave();
-        }, 3000); // Updated to 3 seconds
-
+        debounceTimer.current = setTimeout(handleSave, 1500);
         return () => clearTimeout(debounceTimer.current);
     }, [question, questionType, options]);
 
-
     const handleOptionChange = (index, value) => {
         const updated = [...options];
-        updated[index] = value;
+        updated[index].choiceText = value;
         setOptions(updated);
     };
 
-    const addOption = () => {
-        setOptions([...options, `Option ${options.length + 1}`]);
+    const addOption = async () => {
+        try {
+            const payload = {
+                question: { id: questionData.id },
+                choiceText: `Option ${options.length + 1}`
+            };
+            const res = await axios.post("http://localhost:8080/api/choices", payload, {
+                headers: { "Content-Type": "application/json" },
+            });
+            setOptions([...options, { id: res.data.id, choiceText: res.data.choiceText }]);
+        } catch (error) {
+            console.error("Failed to add option:", error);
+        }
     };
 
-    const removeOption = (index) => {
-        if (options.length > 1) {
+    const removeOption = async (index) => {
+        const toRemove = options[index];
+        try {
+            await axios.delete(`http://localhost:8080/api/choices/${toRemove.id}`);
             setOptions(options.filter((_, i) => i !== index));
+        } catch (error) {
+            console.error("Failed to delete choice:", error);
         }
     };
 
     const renderOptionInput = (option, index) => {
         const InputControl =
-            questionType === "CHECKBOX"
-                ? Checkbox
-                : questionType === "RADIO"
-                    ? Radio
-                    : null;
+            questionType === "CHECKBOX" ? Checkbox :
+            questionType === "RADIO" ? Radio :
+            null;
 
         return (
-            <Box key={index} sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+            <Box key={option.id} sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                 {InputControl && <InputControl disabled />}
                 <TextField
                     variant="outlined"
                     placeholder="Enter option"
-                    value={option}
+                    value={option.choiceText}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                     sx={{ flex: 1, mr: 1 }}
                 />
