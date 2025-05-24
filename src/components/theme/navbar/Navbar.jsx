@@ -21,8 +21,8 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
         link: '/'
       },
       {
-        name: 'Loan details',
-        link: '/loans'
+        name: 'Dashboard',
+        link: '/dashboard'
       },
     ],
     bank: [
@@ -83,7 +83,7 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
   }, [])
 
   return (
-    <>
+    <div className="nav">
       <div style={{
         ...style
       }} className={`navbar ${scrolled ? 'scrolled' : ''}`}>
@@ -154,7 +154,7 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
 
       {/* Optional: Overlay to close menu */}
       {sidebarOpen && <div className="overlay" onClick={toggleSidebar}></div>}
-    </>
+    </div>
   )
 }
 

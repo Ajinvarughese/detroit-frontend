@@ -20,7 +20,7 @@
     width: 65px;
     cursor: pointer;
 }
-ul li {
+.nav ul li {
     display: inline-block;
     margin: 10px 20px;
     font-size: 18px;
@@ -28,12 +28,12 @@ ul li {
     position: relative; /* Needed to position the before pseudo-element */
 }
 
-ul a {
+.nav ul a {
     text-decoration: none;
     color: #fff;
 }
 
-ul li::before {
+.nav ul li::before {
     content: '';
     height: 3px;
     border-radius: 50px;
@@ -46,7 +46,7 @@ ul li::before {
     transform: translateX(-50%); /* Adjust to truly center the line */
 }
 
-ul li:hover::before {
+.nav ul li:hover::before {
     width: 100%; /* Expand the width of the line on hover */
 }
 
@@ -138,7 +138,7 @@ ul li:hover::before {
         z-index: 10;
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     }
-    ul a {
+    .nav ul a {
         color: #fff;
     }
     .nav-links.open {

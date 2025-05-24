@@ -1,8 +1,9 @@
-import landscade from "../assets/page1-icons/landscape.png";
-import handshake from "../assets/page1-icons/handshake.png";
+import landscape from "../assets/page1-icons/landscape.png";
 import cloudy from "../assets/page1-icons/cloudy.png";
 import pawPrint from "../assets/page1-icons/paw-print.png";
 import chart from "../assets/page1-icons/chart.png";
+import marine from "../assets/page1-icons/marine.png";
+import pollution from "../assets/page1-icons/pollution.png";
 import detroit from "../assets/detroit.png"
 
 export const banner = [
@@ -46,28 +47,28 @@ export const page1 = {
   title: 'Loan Categories',
   children: [
     {
-      title: 'Green Loans',
+      title: 'Climate Mitigation Loans',
       content: 'Renewable energy, green buildings, energy efficiency, clean transportation.',
-      src: landscade,
+      src: landscape,
       color: '#52C41A',
       shadowColor: 'rgba(166, 55, 112, 0.08)',
-      link: '#',
+      link: '/loan/climateMitigation',
     },
     {
-      title: 'Social Loans',
+      title: 'Water Sustainability Loans',
       content: 'Affordable housing, education, healthcare, financial inclusion.',
-      src: handshake,
-      color: '#ED5575', 
+      src: marine,
+      color: '#3A9AD9',
       shadowColor: 'rgba(15, 93, 166, 0.08)',
-      link: '#',
+      link: '/loan/water',
     },
     {
-      title: 'Sustainability-Linked Loans (SLLs)',
+      title: 'Pollution Reduction Loans',
       content: 'Emissions reduction targets, water usage efficiency, diversity goals.',
-      src: chart,
-      color: '#722ED1',
-      shadowColor: 'rgba(112, 73, 166, 0.08)',
-      link: '#',
+      src: pollution,
+      color: '#656b76', 
+      shadowColor: 'rgba(101, 107, 118, 0.1)',
+      link: '/loan/pollutionPrevention',
     },
     {
       title: 'Climate Adaptation Loans',
@@ -75,7 +76,15 @@ export const page1 = {
       src: cloudy,
       color: '#237804',
       shadowColor: 'rgba(166, 55, 112, 0.08)',
-      link: '#',
+      link: '/loan/climateAdaptation',
+    },
+    {
+      title: 'Circular Economy Loans',
+      content: 'Flood defenses, drought-resistant agriculture.',
+      src: chart,
+      color: '#722ED1',
+      shadowColor: 'rgba(112, 73, 166, 0.08)',
+      link: '/loan/circularEconomy',
     },
     {
       title: 'Biodiversity & Conservation Loans',
@@ -83,7 +92,7 @@ export const page1 = {
       src: pawPrint,
       color: '#FA8C16',
       shadowColor: 'rgba(166, 55, 112, 0.08)',
-      link: '#',
+      link: '/loan/biodiversity',
     }
   ],
 };
