@@ -2,10 +2,10 @@ import { Spa, TrendingUp, Public, Forest as Eco, Opacity, WaterDrop, Cloud, Recy
 
 // Shared process steps
 export const processSteps = [
-    { step: "1", title: "Submit Project", description: "Share your project goals and expected outcomes." },
-    { step: "2", title: "Expert Review", description: "Our specialists assess impact and viability." },
-    { step: "3", title: "Approval & Support", description: "Receive funding and resources to execute your plan." },
-    { step: "4", title: "Monitoring & Impact", description: "Track improvements and long-term benefits." }
+    { step: "1", title: "Select Loan", description: "Choose a loan type to get started." },
+    { step: "2", title: "Quick Survey", description: "Share your project goals and expected outcomes." },
+    { step: "3", title: "Eligibility Check", description: "We assess impact and viability of your project." },
+    { step: "4", title: "Start Working on your Project", description: "Receive funding and resources to execute your plan." }
 ];
 
 // Data for each loan type

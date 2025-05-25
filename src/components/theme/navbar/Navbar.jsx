@@ -131,8 +131,8 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
                   Login ▾
                 </li>
                 <ul className="dropdown-menu">
-                  <a href="/login/applicant"><li onClick={toggleSidebar}>Applicant</li></a>
-                  <a href="/login/bank"><li onClick={toggleSidebar}>Bank</li></a>
+                  <a href="/login/applicant"><li style={{color: "#000"}} onClick={toggleSidebar}>Applicant</li></a>
+                  <a href="/login/bank"><li style={{color: "#000"}} onClick={toggleSidebar}>Bank</li></a>
                 </ul>
               </div>
             )
