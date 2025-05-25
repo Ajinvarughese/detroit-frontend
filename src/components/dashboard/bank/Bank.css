@@ -1,0 +1,249 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent the page from scrolling */
+}
+
+.bank-dashboard-container {
+  display: flex;
+  height: 100vh; /* Full viewport height */
+  overflow: auto;
+  background: #1e293b;
+}
+
+.bank-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto; /* Enable scrolling within the main content */
+  padding-left: 100px;
+  padding-top: 90px;
+  padding-right: 400px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Sidebar */
+.bank-sidebar {
+  width: 180px;
+  background-color: #0e151b;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.bank-logo {
+  color: #4ade80;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.bank-dash-nav-links,
+.bank-bottom-links {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.bank-dash-nav-links a,
+.bank-bottom-links a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  font-size: 14px;
+}
+
+.bank-dash-nav-links a:hover,
+.bank-bottom-links a:hover {
+  background-color: rgba(74, 222, 128, 0.1);
+}
+
+.bank-dash-nav-links a:first-child {
+  background-color: rgba(74, 222, 128, 0.15);
+  font-weight: bold;
+}
+
+.bank-upgrade-btn {
+  background-color: #4ade80;
+  color: black;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Main Content */
+.bank-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: visible;
+  padding-left: 100px;
+  padding-top: 100px;
+  padding-right: 400px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Top Mobile Session */
+.bank-top-session {
+  position: absolute;
+  top: 50%;
+  right: 17px;
+  transform: translate(-0%, -50%);
+  width: 300px;
+  background-color: #121c24;
+  border-radius: 20px;
+  padding: 64px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  box-sizing: border-box;
+  color: #e5e7eb;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.bank-top-session h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Progress Circle */
+.bank-progress-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 10px solid #1f2a35;
+  border-top: 10px solid #4ade80;
+  position: relative;
+  margin: 0 auto;
+}
+
+.bank-progress-circle::before {
+  content: "38.4%";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #4ade80;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Weekly Analytics */
+.bank-weekly-analytics h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.bank-weekly-analytics ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bank-weekly-analytics li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #2e3a44;
+  font-size: 14px;
+  color: #cbd5e1;
+}
+
+.bank-weekly-analytics li:last-child {
+  border-bottom: none;
+}
+
+.bank-weekly-analytics .bank-trend.up {
+  color: #4ade80;
+  font-weight: 600;
+}
+
+/* Cards */
+.bank-cards {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-start;
+  margin-top: -10%;
+}
+
+.bank-card {
+  background-color: #121c24;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  width: 180px;
+  box-sizing: border-box;
+  color: #e5e7eb;
+}
+
+.bank-card h2 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #a0aec0;
+}
+
+.bank-card .bank-value {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.bank-trend {
+  font-size: 13px;
+  margin-top: 6px;
+  opacity: 0.8;
+}
+
+.bank-trend.up {
+  color: #4ade80;
+}
+
+.bank-trend.down {
+  color: #f87171;
+}
+
+/* Centered Loan Trends Chart */
+.bank-centered-trend {
+  background-color: #121c24;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  color: #e5e7eb;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 700px;
+  min-height: 300px;
+  box-sizing: border-box;
+}
+
+.bank-centered-trend h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.bank-centered-trend canvas {
+  width: 100% !important;
+  height: 250px !important;
+  max-height: 250px;
+  display: block;
+}

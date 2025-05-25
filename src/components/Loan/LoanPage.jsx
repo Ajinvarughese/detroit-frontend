@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from "../theme/navbar/Navbar.jsx";
 import { processSteps, loanData } from './data';
 import { ArrowForward } from '@mui/icons-material';
+import Footer from "../../landing/Footer.jsx"
 
 const LoanPage = ({ type }) => {
     const data = loanData[type];
@@ -73,12 +74,13 @@ const LoanPage = ({ type }) => {
                             <div className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg select-none">
                                 {step}
                             </div>
-                            <h3 className="font-semibold text-lg mb-2">{title}</h3>
-                            <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+                            <h3 style={{marginLeft: "12px"}}  className="font-semibold text-lg mb-2">{title}</h3>
+                            <p style={{marginLeft: "12px"}} className="text-gray-600 text-sm leading-relaxed">{description}</p>
                         </div>
                     ))}
                 </div>
             </section>
+            <Footer />
         </div>
     );
 };
