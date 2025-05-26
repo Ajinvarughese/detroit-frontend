@@ -1,9 +1,9 @@
-html, body {
+/* html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent the page from scrolling */
-}
+  overflow: hidden; 
+ */
 
 .bank-dashboard-container {
   display: flex;

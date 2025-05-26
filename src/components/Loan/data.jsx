@@ -10,13 +10,14 @@ export const processSteps = [
 
 // Data for each loan type
 export const loanData = {
-    biodiversity: {
+    BIODIVERSITY: {
         hero: {
             subtitle: "Biodiversity Conservation",
             title: "Preserve Nature,\nProtect Our Future",
             highlight: "Protect Our Future",
             description: "Join us in safeguarding biodiversity through impactful projects that restore natural habitats, protect endangered species, and promote ecosystem health.",
             buttonText: "Check Project Eligibility"
+            
         },
         benefits: [
             {
@@ -41,7 +42,7 @@ export const loanData = {
             }
         ]
     },
-    water: {
+    WATER: {
         hero: {
             subtitle: "Water Project Loan",
             title: "Secure Clean Water,\nEmpower Communities",
@@ -72,7 +73,7 @@ export const loanData = {
             }
         ]
     },
-    climateAdaptation: {
+    CLIMATE_ADAPTATION: {
         hero: {
             subtitle: "Climate Adaptation Loan",
             title: "Adapt for Tomorrow,\nBuild Resilience",
@@ -103,7 +104,7 @@ export const loanData = {
             }
         ]
     },
-    climateMitigation: {
+    CLIMATE_MITIGATION: {
         hero: {
             subtitle: "Climate Mitigation Loan",
             title: "Reduce Emissions,\nShape a Greener Future",
@@ -134,7 +135,7 @@ export const loanData = {
             }
         ]
     },
-    pollutionPrevention: {
+    POLLUTION_PREVENTION: {
         hero: {
             subtitle: "Pollution Prevention Loan",
             title: "Prevent Pollution,\nProtect Our Planet",
@@ -165,7 +166,7 @@ export const loanData = {
             }
         ]
     },
-    circularEconomy: {
+    CIRCULAR_ECONOMY: {
         hero: {
             subtitle: "Circular Economy Loan",
             title: "Rethink Waste,\nDrive Sustainable Growth",

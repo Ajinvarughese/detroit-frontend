@@ -1,17 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from "../theme/navbar/Navbar.jsx";
-import { processSteps, loanData } from './data';
+import { processSteps, loanData } from './data.jsx';
 import { ArrowForward } from '@mui/icons-material';
 import Footer from "../../landing/Footer.jsx"
+import { getUser } from '../hooks/LocalStorageUser.jsx';
+import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 const LoanPage = ({ type }) => {
+    const navigate = useNavigate();
     const data = loanData[type];
+    const [formId, setFormId] = useState(null);
 
     if (!data) {
         return <div>Loan type not found.</div>;
     }
 
     const { hero, benefits } = data;
+
+    const getForm = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8080/api/questionnaire/loan/${type}`);     
+            const questionnaires = response.data;
+
+            // Find the questionnaire where questionnaireType is "PRIMARY"
+            const primaryQuestionnaire = questionnaires.find(q => q.questionnaireType === "PRIMARY");
+            setFormId(primaryQuestionnaire.formUrlId);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        getForm();
+    }, [type]);
 
     return (
         <div className="font-sans">
@@ -30,13 +52,17 @@ const LoanPage = ({ type }) => {
                     <p className="max-w-xl mx-auto opacity-90 mb-10 text-lg">
                         {hero.description}
                     </p>
-                    <button
-                        style={{ cursor: "pointer" }}
-                        onClick={() => window.location.href = "/questionnaire/"}
-                        className="bg-white text-green-700 font-bold px-10 py-3 rounded-full shadow-md hover:bg-gray-100 transition"
-                    >
-                        {hero.buttonText} <ArrowForward className="inline-block ml-2" />
-                    </button>
+                    {
+                        getUser("user").role == "APPLICANT" && (
+                            <button
+                                style={{ cursor: "pointer" }}
+                                onClick={() => navigate(`/questionnaire/form/${formId}`)}
+                                className="bg-white text-green-700 font-bold px-10 py-3 rounded-full shadow-md hover:bg-gray-100 transition"
+                            >
+                                {hero.buttonText} <ArrowForward className="inline-block ml-2" />
+                            </button>
+                        )
+                    }
                 </div>
             </section>
 

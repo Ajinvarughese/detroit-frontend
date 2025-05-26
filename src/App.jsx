@@ -8,9 +8,9 @@ import Questionnaire from "./components/questionnaire/Questionnaire.jsx";
 import LoanPage from "./components/Loan/LoanPage.jsx";
 import Applicant from "./components/dashboard/applicant/Applicant";
 import Bank from "./components/dashboard/bank/Bank";
+import AnswerForm from './components/answer/AnswerForm';
 
 function App() {
-
   return (
     <>
     <BrowserRouter>
@@ -27,17 +27,18 @@ function App() {
       getUser('user').role === "APPLICANT" &&
       <Routes>
         <Route path='/dashboard' element={<Applicant />} />
+        <Route path='/questionnaire/form/:id' element={<AnswerForm />} />
       </Routes>
 
     }
       {/* Loan pages */}
       <Routes>
-        <Route path='/loan/biodiversity' element={<LoanPage type={"biodiversity"} />} />
-        <Route path='/loan/water' element={<LoanPage type={"water"} />} />
-        <Route path='/loan/climateAdaptation' element={<LoanPage type={"climateAdaptation"} />} />
-        <Route path='/loan/climateMitigation' element={<LoanPage type={"climateMitigation"} />} />
-        <Route path='/loan/pollutionPrevention' element={<LoanPage type={"pollutionPrevention"} />} />
-        <Route path='/loan/circularEconomy' element={<LoanPage type={"circularEconomy"} />} />
+        <Route path='/loan/biodiversity' element={<LoanPage type={"BIODIVERSITY"} />} />
+        <Route path='/loan/water' element={<LoanPage type={"WATER"} />} />
+        <Route path='/loan/climateAdaptation' element={<LoanPage type={"CLIMATE_ADAPTATION"} />} />
+        <Route path='/loan/climateMitigation' element={<LoanPage type={"CLIMATE_MITIGATION"} />} />
+        <Route path='/loan/pollutionPrevention' element={<LoanPage type={"POLLUTION_PREVENTION"} />} />
+        <Route path='/loan/circularEconomy' element={<LoanPage type={"CIRCULAR_ECONOMY"} />} />
       </Routes>
       
 
