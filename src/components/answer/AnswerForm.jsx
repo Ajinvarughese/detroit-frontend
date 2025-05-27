@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 
 import { useParams } from 'react-router';
+import { getUser } from '../hooks/LocalStorageUser';
 
 const AnswerForm = () => {
   const { id } = useParams();
@@ -65,13 +66,35 @@ const AnswerForm = () => {
   };
 
   const handleSubmit = async () => {
-    const submission = Object.entries(responses).map(([questionId, response]) => ({
-      questionId,
-      response,
-    }));
-    console.log(submission);
+    const submission = Object.values(responses).flatMap((response) => {
+      if (Array.isArray(response)) {
+        // For CHECKBOX type (multiple responses)
+        return response.map((res) => ({
+          user: {
+            id: getUser("user").id
+          },
+          choice: {
+            id: res.choiceId
+          },
+          answerText: res.value
+        }));
+      } else {
+        // For TEXT, RADIO, FILE types (single response)
+        return {
+          user: {
+            id: getUser("user").id
+          },
+          choice: {
+            id: response.choiceId
+          },
+          answerText: response.value
+        };
+      }
+    });
+
     try {
-      const response = await axios.post("http://localhost:8080/api/questionnaire/submit", submission, {
+      console.log(submission);
+      const response = await axios.post("http://localhost:8080/api/answers", submission, {
         'Content-type': 'application/json'
       });
       setSubmitted(true);
@@ -80,6 +103,7 @@ const AnswerForm = () => {
       console.error('Error submitting data:', error);
     }
   };
+
 
   if (submitted) {
     return (

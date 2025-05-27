@@ -9,6 +9,7 @@ import LoanPage from "./components/Loan/LoanPage.jsx";
 import Applicant from "./components/dashboard/applicant/Applicant";
 import Bank from "./components/dashboard/bank/Bank";
 import AnswerForm from './components/answer/AnswerForm';
+import LoanApplicationForm from './components/loan/loanApplication/LoanApplicationForm';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
       <Routes>
         <Route path='/dashboard' element={<Applicant />} />
         <Route path='/questionnaire/form/:id' element={<AnswerForm />} />
+        <Route path='/loan' element={<LoanApplicationForm />} />
       </Routes>
 
     }

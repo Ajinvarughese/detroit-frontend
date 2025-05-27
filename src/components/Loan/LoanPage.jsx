@@ -6,6 +6,8 @@ import Footer from "../../landing/Footer.jsx"
 import { getUser } from '../hooks/LocalStorageUser.jsx';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import { CircularProgress } from "@mui/material";
+// import { ArrowForward } from "lucide-react";
 
 const LoanPage = ({ type }) => {
     const navigate = useNavigate();
@@ -55,11 +57,21 @@ const LoanPage = ({ type }) => {
                     {
                         getUser("user").role == "APPLICANT" && (
                             <button
-                                style={{ cursor: "pointer" }}
-                                onClick={() => navigate(`/questionnaire/form/${formId}`)}
-                                className="bg-white text-green-700 font-bold px-10 py-3 rounded-full shadow-md hover:bg-gray-100 transition"
+                                style={{ cursor: formId ? "pointer" : "not-allowed" }}
+                                onClick={() => formId && navigate(`/questionnaire/form/${formId}`)}
+                                className={`bg-white text-green-700 font-bold px-10 py-3 rounded-full shadow-md transition`}
+                                disabled={formId ? false : true}
+                                
                             >
-                                {hero.buttonText} <ArrowForward className="inline-block ml-2" />
+                                {formId ? (
+                                    <>
+                                        {hero.buttonText} <ArrowForward className="inline-block ml-2" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <CircularProgress color='#fff' size={20} style={{margin: "0px 32px"}} />
+                                    </>
+                                )}
                             </button>
                         )
                     }
