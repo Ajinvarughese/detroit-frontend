@@ -22,14 +22,16 @@ function App() {
         <Route path='/questionnaire/editor/:id' element={<QuestionnaireEditor />} />
         <Route path='/questionnaire' element={<Questionnaire />} />
         <Route path='/dashboard' element={<Bank />} />
+        <Route path='/questionnaire/preview/:id' element={<AnswerForm preview />} />
       </Routes>
     }
     {
       getUser('user').role === "APPLICANT" &&
       <Routes>
         <Route path='/dashboard' element={<Applicant />} />
+        <Route path='/dashboard/feedback' element={ <Applicant page="feedback" /> } />
         <Route path='/questionnaire/form/:id' element={<AnswerForm />} />
-        <Route path='/loan' element={<LoanApplicationForm />} />
+        <Route path='/loan/application/:loanType/:loanUUID' element={<LoanApplicationForm />} />
       </Routes>
 
     }

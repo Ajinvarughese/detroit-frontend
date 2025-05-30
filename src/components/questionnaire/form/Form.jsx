@@ -9,6 +9,7 @@ import {
     Radio,
     Select,
     FormControl,
+    Button,
 } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
@@ -33,12 +34,28 @@ const styles = {
     }
 };
 
-const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
+
+const Form = ({ questionData, loanCategory, questionCount, isLast=false, onDelete, questionnaireId }) => {
     const [question, setQuestion] = useState(questionData?.questionText || "Untitled Question");
     const [questionType, setQuestionType] = useState(questionData?.questionType || "RADIO");
     const [options, setOptions] = useState([]);
+    const [rules, setRules] = useState({});
     const debounceTimer = useRef(null);
     const hasFetchedRef = useRef(false);
+
+
+    const fetchRules = async () => {
+        try {
+            const res = await axios.get(`http://localhost:8080/api/rules/${loanCategory}`);
+            setRules(res.data);
+        } catch (error) {
+            console.error("Error fetching rules:", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchRules();
+    },[loanCategory]);
 
     const fetchOptions = async () => {
         if (hasFetchedRef.current || !questionData.id) return;
@@ -149,6 +166,7 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
 
     const removeOption = async (index) => {
         const toRemove = options[index];
+        console.log(toRemove);
         try {
             await axios.delete(`http://localhost:8080/api/choices/${toRemove.id}`);
             setOptions(options.filter((_, i) => i !== index));
@@ -156,6 +174,7 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
             console.error("Failed to delete choice:", error);
         }
     };
+
 
     const renderOptionInput = (option, index) => {
         const InputControl =
@@ -195,6 +214,52 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
             </Box>
         );
     };
+
+    const defaultQuestion = async (val) => {
+        if (!questionData?.id) {
+            console.error("Question ID not found.");
+            return;
+        }
+
+        let choices = [];
+        removeOption(0);
+        if (val === 'sector') {
+            setQuestion("What sector from below most suits your project?");
+            setQuestionType("DROPDOWN");
+            const sectors = [...new Set(rules.map(rule => rule.sector))];
+
+            // Create options in backend
+            choices = await Promise.all(sectors.map(async (sector) => {
+                const payload = {
+                    question: { id: questionData.id },
+                    choiceText: sector,
+                    score: 0
+                };
+                const res = await axios.post("http://localhost:8080/api/choices", payload, {
+                    headers: { "Content-Type": "application/json" },
+                });
+                return { id: res.data.id, choiceText: res.data.choiceText, score: res.data.score };
+            }));
+        } else if (val === 'activity') {
+            setQuestion("What activity from below most suits your project?");
+            setQuestionType("DROPDOWN");
+            const activities = [...new Set(rules.map(rule => rule.activityName))];
+
+            choices = await Promise.all(activities.map(async (activity) => {
+                const payload = {
+                    question: { id: questionData.id },
+                    choiceText: activity,
+                    score: 0
+                };
+                const res = await axios.post("http://localhost:8080/api/choices", payload, {
+                    headers: { "Content-Type": "application/json" },
+                });
+                return { id: res.data.id, choiceText: res.data.choiceText, score: res.data.score };
+            }));
+        }
+        setOptions(choices);
+    };
+
 
     return (
         <motion.div
@@ -265,6 +330,37 @@ const Form = ({ questionData, questionCount, onDelete, questionnaireId }) => {
                     </Box>
                 </FormControl>
             </Box>
+            {
+                isLast &&
+                (
+                    <Box 
+                        sx={{
+                            background: "#fff",
+                            maxWidth: "800px",
+                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                            width: "100%",
+                            mx: "auto",
+                            p: "2rem",
+                            pt: "0.5rem",
+                            borderRadius: 2,
+                            mb: 2
+                        }}
+                    >
+                        <Typography sx={{opacity: 0.7}} variant="caption">You can ask built in questions like from below.</Typography>
+                        <Box
+                            sx={{
+                                mt: 2,
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 2,
+                            }}
+                        >
+                            <Button variant="outlined" onClick={() => defaultQuestion("sector")}>What sector?</Button>
+                            <Button variant="outlined" onClick={() => defaultQuestion("activity") }>What activity?</Button>
+                        </Box>
+                    </Box>
+                )
+            }
         </motion.div>
     );
 };

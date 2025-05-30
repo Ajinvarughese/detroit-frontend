@@ -6,8 +6,12 @@ import {
   FaEye, FaEyeSlash, FaBriefcase
 } from "react-icons/fa";
 import { saveUser } from '../hooks/LocalStorageUser';
+import { useNavigate } from "react-router";
 
 const Loginpage = ({ user }) => {
+
+  const navigate = useNavigate();
+
   const [showPass, setShowPass] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isRegistration, setIsRegistration] = useState(false);
@@ -56,7 +60,7 @@ const Loginpage = ({ user }) => {
       });
       console.log('Login success:', response.data);
       saveUser(response.data);
-      window.location.href = '/';
+      navigate("/");
     } catch (error) {
       alert("Error occurred during login");
       console.error('Login error:', error.response?.data || error.message);
@@ -95,7 +99,7 @@ const Loginpage = ({ user }) => {
       address: registerData.address,
       role: user,
       organization: registerData.organization,
-      subRole: registerData.role
+      subRole: user === "APPLICANT" ? registerData.role : null
     };
 
     try {
@@ -104,7 +108,7 @@ const Loginpage = ({ user }) => {
       });
       console.log('Registration success:', response.data);
       saveUser(response.data);
-      window.location.href = '/';
+      navigate('/');
     } catch (error) {
       console.error('Registration error:', error.response?.data || error.message);
     }
@@ -122,10 +126,13 @@ const Loginpage = ({ user }) => {
 
   return (
     <div className="container">
-      <div className="wrapper">
+      <div style={{
+      width: '100%',
+      maxWidth: isRegistration ? '500px' : '400px'
+    }} className="wrapper">
         {/* Login Form */}
         {!isForgotPassword && !isRegistration && (
-          <div className="form-box login">
+          <div style={{width: "100%"}} className="form-box login">
             <form onSubmit={handleLoginSubmit}>
               <h1>Login</h1>
               <div className="input-box">
@@ -149,8 +156,8 @@ const Loginpage = ({ user }) => {
                   value={loginData.password}
                   onChange={handleLoginChange}
                 />
-                <div onClick={() => setShowPass(!showPass)} style={{ cursor: 'pointer' }}>
-                  {showPass ? <FaEye className="icon" /> : <FaEyeSlash className="icon" />}
+                <div className="icon"  onClick={() => setShowPass(!showPass)} style={{ zIndex: 100, cursor: 'pointer' }}>
+                  {showPass ? <FaEye /> : <FaEyeSlash />}
                 </div>
               </div>
 
@@ -280,9 +287,8 @@ const Loginpage = ({ user }) => {
                     required
                   >
                     <option value="">Select Role</option>
-                    <option value="QUESTIONNAIRE_SERVICE">Questionnaire</option>
-                    <option value="SF_SERVICE">Sustainable Finance</option>
-                    <option value="RULE_SERVICE">Rule</option>
+                    <option value="BANK">Bank</option>
+                    <option value="ADMIN">Admin</option>
                   </select>
                   <FaBriefcase className="icon" />
                 </div>

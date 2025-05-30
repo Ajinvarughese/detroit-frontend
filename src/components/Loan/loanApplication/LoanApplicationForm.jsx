@@ -4,14 +4,20 @@ import {
   InputLabel, FormControl, Input, Grid, InputAdornment, styled
 } from '@mui/material';
 import { User, CalendarDays, Percent, CloudUploadIcon } from 'lucide-react';
-import { convertToString } from '../../hooks/EnumToString';
+import { convertToEnum, convertToString, toTitleCase } from '../../hooks/EnumToString';
 import { PictureAsPdf } from '@mui/icons-material';
+import { useParams } from 'react-router';
+import { getUser } from '../../hooks/LocalStorageUser';
+import axios from 'axios';
+import { getDate } from '../../hooks/CurrentDate';
 
 const loanCategory = [
   "POLLUTION_PREVENTION",
   "CLIMATE_ADAPTATION",
   "CLIMATE_MITIGATION",
-  "CIRCULAR_ECONOMY"
+  "CIRCULAR_ECONOMY",
+  "BIODIVERSITY",
+  "WATER"
 ];
 
 const VisuallyHiddenInput = (props) => (
@@ -45,12 +51,15 @@ const styles = {
 
 const LoanApplicationForm = () => {
 
+  var { loanType, loanUUID } = useParams();
+  loanType = toTitleCase(loanType);
+  const [helperText, setHelperText] = useState("");
+
   const [form, setForm] = useState({
-    userId: '',
-    loanCategory: '',
+    email: getUser('user').email,
+    loanCategory: convertToEnum(loanType),
     amount: '',
     durationMonths: '',
-    interestRate: '',
     projectReport: null,
   });
 
@@ -60,23 +69,32 @@ const LoanApplicationForm = () => {
     const file = event.target.files[0];
     setUploadedFiles(file ? [file] : []);
     // Optional: Also update form.projectReport if you want to keep it synced
-    setForm(prev => ({ ...prev, projectReport: file || null }));
+    setForm(prev => ({ ...prev, projectReport: file || null }));  
   };
-
-
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
     if (name === 'amount') {
-      // Remove non-digit characters
       const rawValue = value.replace(/\D/g, '');
-      // Format only if there's a valid number
       const formattedValue = rawValue ? new Intl.NumberFormat('en-IN').format(rawValue) : '';
       setForm((prev) => ({
         ...prev,
         [name]: formattedValue
       }));
+    } else if(name === 'durationMonths') {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value
+      }));
+      const year = Math.floor(value / 12);
+      const yearText = year > 1 ? year + " years" : year + " year";
+      const months = value % 12;
+      const monthsText = months > 1 ? months + " months" : months + " month";
+      
+      const text = year > 0 && months > 0 ? `${yearText} and ${monthsText}` : year > 0 ? `${yearText}` : `${monthsText}`; 
+      setHelperText(text);
+
     } else {
       setForm((prev) => ({
         ...prev,
@@ -85,9 +103,42 @@ const LoanApplicationForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Loan Registration Submitted:', form);
+    const user = getUser('user');
+    const parm = {
+      email: user.email,
+      password: user.password,
+      role: user.role,
+      encrypted: true
+    }
+    console.log(parm);
+    const loanRes = await axios.post("http://localhost:8080/api/loan/application/" + loanUUID, parm, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const loan = loanRes.data;
+    loan.email = form.email;
+    loan.loanCategory = form.loanCategory;
+    loan.durationMonths = form.durationMonths;
+
+    const formData = new FormData();
+    formData.append("loan", new Blob([JSON.stringify(loan)], { type: "application/json" }));
+    formData.append("projectReport", form.projectReport);
+
+    console.log(formData.get("loan"));
+    console.log(formData.get("projectReport"));
+    
+    try {
+      const updatedLoan = await axios.put("http://localhost:8080/api/loan", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      console.log(updatedLoan);
+    } catch (error) {
+      alert("Please fill out all the fields.");
+      console.error("Error occured: "+error);
+    }
   };
 
   return (
@@ -101,6 +152,9 @@ const LoanApplicationForm = () => {
         <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
           Loan Application
         </Typography>
+        <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
+          for {loanType} Projects
+        </Typography>
         <Typography variant="body1" align="center" color="textSecondary" mb={4}>
           Complete the fields below to apply for the loan
         </Typography>
@@ -112,8 +166,8 @@ const LoanApplicationForm = () => {
               <TextField
                 fullWidth
                 label="User ID"
-                name="userId"
-                value={form.userId}
+                name="email"
+                value={form.email}
                 onChange={handleChange}
                 required
                 InputProps={{
@@ -172,20 +226,25 @@ const LoanApplicationForm = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                type="date"
+                type='number'
                 label="Duration (Months)"
                 name="durationMonths"
+                helperText={helperText}
                 value={form.durationMonths}
                 onChange={handleChange}
                 required
+                sx={styles.input}
                 InputProps={{
-                  startAdornment: <CalendarDays size={20} style={{ marginRight: 8 }} />
+                  inputProps: {
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                  },
                 }}
               />
             </Grid>
             
-
-            {/* Interest Rate */}
+            {/*Interest Rate*/}
+            {/*
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -200,7 +259,7 @@ const LoanApplicationForm = () => {
                   startAdornment: <Percent size={20} style={{ marginRight: 8 }} />
                 }}
               />
-            </Grid>
+            </Grid> */}
 
             {/* Project Report*/}
             <Grid item xs={12}>
@@ -221,7 +280,13 @@ const LoanApplicationForm = () => {
               {/* Upload Button */}
               <Button
                 component="label"
-                variant="contained"
+                variant="text"
+                sx={{
+                  padding: "7px 15px",
+                  "&:hover": {
+                    background: "rgba(25, 118, 210, 0.1)"
+                  }
+                }}
                 startIcon={<CloudUploadIcon />}
               >
                 Upload files
@@ -244,6 +309,7 @@ const LoanApplicationForm = () => {
                   py: 1.5,
                   fontWeight: 'bold'
                 }}
+                onClick={handleSubmit}
               >
                 Submit Application
               </Button>

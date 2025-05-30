@@ -9,27 +9,35 @@ import {
   RadioGroup,
   FormControlLabel,
   FormControl,
-  FormLabel,
   Checkbox,
   LinearProgress,
   Paper,
 } from '@mui/material';
-
-import { useParams } from 'react-router';
+import { Select } from 'antd';
+import { useNavigate, useParams } from 'react-router';
 import { getUser } from '../hooks/LocalStorageUser';
+import { toCamelCase } from '../hooks/EnumToString';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-const AnswerForm = () => {
+const { Option } = Select;
+
+const AnswerForm = ({ preview = false }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
+  const [questionnaire, setQuestionnaire] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notEligible, setNotEligible] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log(id);
         const response = await axios.get(`http://localhost:8080/api/questionnaire/u/form/${id}`);
+        setQuestionnaire(response.data);
         const fetchedQuestions = response.data.questions.map((q) => ({
           id: q.id,
           text: q.questionText,
@@ -45,7 +53,7 @@ const AnswerForm = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   const handleChange = (qid, value) => {
     setResponses((prev) => ({ ...prev, [qid]: value }));
@@ -66,58 +74,88 @@ const AnswerForm = () => {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     const submission = Object.values(responses).flatMap((response) => {
       if (Array.isArray(response)) {
-        // For CHECKBOX type (multiple responses)
         return response.map((res) => ({
-          user: {
-            id: getUser("user").id
-          },
-          choice: {
-            id: res.choiceId
-          },
+          user: { id: getUser("user").id },
+          choice: res.choiceId ? { id: res.choiceId } : null,
           answerText: res.value
         }));
       } else {
-        // For TEXT, RADIO, FILE types (single response)
         return {
-          user: {
-            id: getUser("user").id
-          },
-          choice: {
-            id: response.choiceId
-          },
+          user: { id: getUser("user").id },
+          choice: response.choiceId ? { id: response.choiceId } : null,
           answerText: response.value
         };
       }
     });
 
-    try {
-      console.log(submission);
-      const response = await axios.post("http://localhost:8080/api/answers", submission, {
-        'Content-type': 'application/json'
-      });
-      setSubmitted(true);
-      console.log(response.data); 
-    } catch (error) {
-      console.error('Error submitting data:', error);
+    if(!preview) {
+      try {
+        const param = {
+          questionnaire: { id: questionnaire.id },
+          user: { id: getUser("user").id },
+          answers: submission
+        };
+        console.log(param);
+        const res = await axios.post("http://localhost:8080/api/loan", param, {
+          'Content-type': 'application/json'
+        });
+        navigate(`/loan/application/${toCamelCase(questionnaire.loanCategory)}/${res.data.loanUUID}`);
+      } catch (error) {
+        if (error.response && error.response.status === 406) {
+          console.log("Not acceptable");
+          setNotEligible(true);
+        } else {
+          console.error('Error submitting data:', error);
+        }
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      setIsSubmitting(false);
     }
   };
 
-
-  if (submitted) {
+  if (notEligible) {
     return (
-      <div className="questionnaire-wrapper">
-        <div className="questionnaire-box">✅ Thank you for submitting!</div>
-      </div>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          backgroundColor: '#f9f9f9',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: 2,
+        }}
+      >
+        <Paper elevation={6} sx={{ p: 4, maxWidth: 500, textAlign: 'center', borderRadius: 3 }}>
+          <ErrorOutlineIcon color="error" sx={{ fontSize: 60, mb: 2 }} />
+          <Typography variant="h5" color="error" gutterBottom>
+            Not Eligible
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Unfortunately, you are not eligible for this loan due to not meeting the sustainability criteria.
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate(`/loan/${toCamelCase(questionnaire.loanCategory)}`)}
+          >
+            Go Back
+          </Button>
+        </Paper>
+      </Box>
     );
   }
 
   if (!questions.length) {
     return (
-      <div className="questionnaire-wrapper">
-        <div className="questionnaire-box">Loading...</div>
-      </div>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <Typography variant="h6">Loading...</Typography>
+      </Box>
     );
   }
 
@@ -135,10 +173,14 @@ const AnswerForm = () => {
         p: 2,
       }}
     >
-      <Paper elevation={6} sx={{ width: 500, p: 4, borderRadius: 3 }}>
+      <Paper elevation={6} sx={{ 
+          width: 500, 
+          p: 4, 
+          borderRadius: 3 
+        }}>
         <Box display="flex" alignItems="center" mb={4}>
-          <Button onClick={handlePrev} disabled={currentIndex === 0}>
-            ← Back
+          <Button onClick={handlePrev} disabled={currentIndex === 0} startIcon={<ArrowBackIcon />}>
+            Back
           </Button>
           <Box sx={{ flexGrow: 1, ml: 2 }}>
             <LinearProgress
@@ -148,9 +190,7 @@ const AnswerForm = () => {
           </Box>
         </Box>
 
-        <Typography variant="h6" gutterBottom>
-          {question.text}
-        </Typography>
+        <Typography variant="h6" gutterBottom>{question.text}</Typography>
         <Typography variant="body2" color="text.secondary" mb={3}>
           {question.type === 'TEXT'
             ? 'Please enter your answer here.'
@@ -158,20 +198,22 @@ const AnswerForm = () => {
             ? 'Please select an option.'
             : question.type === 'FILE'
             ? 'Please upload your file here.'
-            : 'Please select all that apply.'}
+            : question.type === 'CHECKBOX'
+            ? 'Please select all that apply.'
+            : question.type === 'DROPDOWN'
+            ? 'Please select an option from the dropdown.'
+            : ''}
         </Typography>
 
+        {/* Render different input types */}
         {question.type === 'TEXT' && (
           <TextField
             fullWidth
             variant="outlined"
             value={responses[question.id]?.value || ''}
-            onChange={(e) =>
-              handleChange(question.id, { value: e.target.value })
-            }
+            onChange={(e) => handleChange(question.id, { value: e.target.value })}
           />
         )}
-
         {question.type === 'RADIO' && (
           <FormControl component="fieldset">
             <RadioGroup
@@ -184,17 +226,11 @@ const AnswerForm = () => {
               }
             >
               {question.options.map((opt) => (
-                <FormControlLabel
-                  key={opt.id}
-                  value={opt.id}
-                  control={<Radio />}
-                  label={opt.text}
-                />
+                <FormControlLabel key={opt.id} value={opt.id} control={<Radio />} label={opt.text} />
               ))}
             </RadioGroup>
           </FormControl>
         )}
-
         {question.type === 'CHECKBOX' && (
           <FormControl component="fieldset">
             {question.options.map((opt) => (
@@ -202,9 +238,7 @@ const AnswerForm = () => {
                 key={opt.id}
                 control={
                   <Checkbox
-                    checked={
-                      responses[question.id]?.some((res) => res.choiceId === opt.id) || false
-                    }
+                    checked={responses[question.id]?.some((res) => res.choiceId === opt.id) || false}
                     onChange={(e) => {
                       const prevChoices = responses[question.id] || [];
                       const updatedChoices = e.target.checked
@@ -219,23 +253,30 @@ const AnswerForm = () => {
             ))}
           </FormControl>
         )}
-
         {question.type === 'FILE' && (
-          <Button
-            variant="outlined"
-            component="label"
-            fullWidth
-            sx={{ mt: 2 }}
-          >
+          <Button variant="outlined" component="label" fullWidth sx={{ mt: 2 }}>
             Upload File
             <input
               type="file"
               hidden
-              onChange={(e) =>
-                handleChange(question.id, { file: e.target.files[0] })
-              }
+              onChange={(e) => handleChange(question.id, { file: e.target.files[0] })}
             />
           </Button>
+        )}
+        {question.type === 'DROPDOWN' && (
+          <Select
+            style={{ width: '100%', height: 54 }}
+            placeholder="Select an option"
+            value={responses[question.id]?.choiceId || undefined}
+            onChange={(value) => {
+              const selectedOption = question.options.find((opt) => opt.id === value);
+              handleChange(question.id, { choiceId: selectedOption.id, value: selectedOption.text });
+            }}
+          >
+            {question.options.map((opt) => (
+              <Option style={{padding: "15px 10px", borderRadius: '0', borderTop:"1px solid #ccc"}} key={opt.id} value={opt.id}>{opt.text}</Option>
+            ))}
+          </Select>
         )}
 
         <Button

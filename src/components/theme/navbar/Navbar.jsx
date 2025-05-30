@@ -4,9 +4,12 @@ import { FaBars, FaTimes } from 'react-icons/fa'
 import logo_light from '../../../assets/DETROIT.png'
 import search_icon_light from '../../../assets/search-w.png'
 import { deleteUser, getUser } from '../../hooks/LocalStorageUser'
+import { useNavigate } from 'react-router'
 
 
 const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
+
+  const navigate = useNavigate();
 
   const navList = {
     guest: [
@@ -27,16 +30,12 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
     ],
     bank: [
       {
+        name: 'Dashboard',
+      link: '/dashboard'
+      },
+      {
         name: 'Questionnaire',
         link: '/questionnaire',
-      },
-      {
-        name: 'SF',
-      link: '/sf'
-      },
-      {
-        name: 'Rules',
-        link: '/rules'
       },
     ]
   }
@@ -115,7 +114,7 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
                   onClick={() => {
                     toggleSidebar
                     deleteUser();
-                    window.location.reload();
+                    navigate("/")
                   }
                 }>
                   Logout
@@ -137,7 +136,6 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
               </div>
             )
           }
-
         </ul>
 
         <div className="search-box">

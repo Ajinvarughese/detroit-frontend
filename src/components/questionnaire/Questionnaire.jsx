@@ -5,13 +5,16 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router";
+import { convertToEnum } from '../hooks/EnumToString';
 
 const templates = [
-    { title: "Blank form", color: "#f0f0f0", icon: "📄" },
-    { title: "Contact Information", color: "#c8e6c9", icon: "🧑" },
-    { title: "RSVP", color: "#ffe0b2", icon: "✨" },
-    { title: "Party Invite", color: "#ffccbc", icon: "🎉" },
-    { title: "T-Shirt Sign Up", color: "#e1bee7", icon: "👕" },
+    { title: "Blank Form", color: "#f0f0f0", icon: "📄" },
+    { title: "Water", color: "#c8e6c9", icon: "🌊" },
+    { title: "Biodiversity", color: "#ffe0b2", icon: "🐾" },
+    { title: "Climate Mitigation", color: "#ffccbc", icon: "🌲" },
+    { title: "Climate Adaptation", color: "#e1bee7", icon: "🌦️" },
+    { title: "Pollution Prevention", color: "#b2dfdb", icon: "🏭"},
+    { title: "Circular Economy", color:"#e0f2f1", icon: "📈"}
 ];
 
 const cardColors = [
@@ -37,13 +40,14 @@ function Questionnaire() {
         formResponse();
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (category) => {
         setCreating(true); // NEW
+        const loanCategory = category === "Blank Form" ? null : convertToEnum(category);
         const questionnaireParms = {
             formUrlId: uuidv4(),
             title: "Untitled Form",
             description: "Form description",
+            loanCategory
         };
         try {
             const response = await axios.post("http://localhost:8080/api/questionnaire", questionnaireParms, {
@@ -98,7 +102,7 @@ function Questionnaire() {
                 <h3>Start a new form</h3>
                 <div className="template-grid">
                     {templates.map((tpl, index) => (
-                        <div onClick={handleSubmit} key={index} className="template-card" style={{ backgroundColor: tpl.color }}>
+                        <div onClick={() => handleSubmit(tpl.title)} key={index} className="template-card" style={{ backgroundColor: tpl.color }}>
                             <div className="form-preview">{tpl.icon}</div>
                             <p>{tpl.title}</p>
                         </div>

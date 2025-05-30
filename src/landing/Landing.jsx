@@ -59,10 +59,10 @@ function Landing() {
           width: "100%",
         }}
       >
-        <Spline
+        {/* <Spline
           className="w-full h-full"
           scene="https://prod.spline.design/l9uYXrNtML6SbrEf/scene.splinecode"
-        />
+        /> */}
       </Background>    
 
       <Box sx={style.header} >

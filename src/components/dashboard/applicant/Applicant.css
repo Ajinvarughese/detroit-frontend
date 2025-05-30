@@ -56,11 +56,6 @@
   color: #e5e7eb;
 }
 
-.applicant-nav-links a:first-child {
-  background-color: rgba(74, 222, 128, 0.15); /* Active link style */
-  font-weight: bold;
-}
-
 .applicant-logout {
   margin-top: auto;
   color: #f87171; /* Logout in red */
@@ -87,7 +82,6 @@
 
 .applicant-main-content {
   flex: 1;
-  padding: 24px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;

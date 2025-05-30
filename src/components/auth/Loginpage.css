@@ -73,7 +73,6 @@
     transform: translateY(-50%);
     font-size: 16px;
     color: #fff;
-    pointer-events: none;
   }
   
   .input-box input:focus,

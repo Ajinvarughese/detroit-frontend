@@ -77,7 +77,7 @@ const QuestionnaireEditor = () => {
     useEffect(() => {
         const fetchLoanCategories = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/api/loans/categories");
+                const res = await axios.get("http://localhost:8080/api/loan/categories");
                 setLoanCategoryOptions(res.data);
             } catch (error) {
                 console.error("Failed to fetch loan categories:", error);
@@ -170,7 +170,7 @@ const QuestionnaireEditor = () => {
                 <Typography variant="inherit" sx={{ ml: 2 }}>Questionnaire Form</Typography>
                 <Box sx={{ flexGrow: 1 }} />
                 <Button loading={isLoading} disabled={isLoading} variant="outlined" onClick={handleSave}>Save</Button>
-                <Button disabled={isLoading} sx={{ ml: 2 }} variant="contained">Publish</Button>
+                <Button disabled={isLoading} onClick={() => navigate(`/questionnaire/preview/${id}`)} sx={{ ml: 2 }} variant="contained">Preview</Button>
             </Box>
 
             {/* Templates Dropdown */}
@@ -214,11 +214,17 @@ const QuestionnaireEditor = () => {
             <AnimatePresence>
                 {questions.map((q, index) => (
                     <motion.div key={q.questionUUID} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.3 }}>
-                        <Form questionCount={index + 1} questionData={q} questionnaireId={q.questionnaire?.id} onDelete={() => removeQuestion(q)} />
+                        <Form 
+                            questionCount={index + 1} 
+                            isLast={index >= questions.length-1}
+                            questionData={q} 
+                            questionnaireId={q.questionnaire?.id} 
+                            onDelete={() => removeQuestion(q)} 
+                            loanCategory={selectedLoanCategory}
+                        />
                     </motion.div>
                 ))}
             </AnimatePresence>
-
             {/* Add Question Button */}
             <Box sx={{ maxWidth: "800px", margin: "0 auto", width: "100%" }}>
                 <Button variant="contained" onClick={addNewQuestion} endIcon={<Add />}>Add Question</Button>
