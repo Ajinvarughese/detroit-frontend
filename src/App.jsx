@@ -29,6 +29,8 @@ function App() {
       getUser('user').role === "APPLICANT" &&
       <Routes>
         <Route path='/dashboard' element={<Applicant />} />
+        <Route path='/dashboard/loan' element={<Applicant page='loan' />}/>
+        <Route path='/dashboard/loan/:id' element={<Applicant page='loanDetails' />} />
         <Route path='/dashboard/feedback' element={ <Applicant page="feedback" /> } />
         <Route path='/questionnaire/form/:id' element={<AnswerForm />} />
         <Route path='/loan/application/:loanType/:loanUUID' element={<LoanApplicationForm />} />

@@ -6,7 +6,7 @@ import {
 import { User, CalendarDays, Percent, CloudUploadIcon } from 'lucide-react';
 import { convertToEnum, convertToString, toTitleCase } from '../../hooks/EnumToString';
 import { PictureAsPdf } from '@mui/icons-material';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { getUser } from '../../hooks/LocalStorageUser';
 import axios from 'axios';
 import { getDate } from '../../hooks/CurrentDate';
@@ -50,6 +50,7 @@ const styles = {
 };
 
 const LoanApplicationForm = () => {
+  const navigate = useNavigate();
 
   var { loanType, loanUUID } = useParams();
   loanType = toTitleCase(loanType);
@@ -61,6 +62,7 @@ const LoanApplicationForm = () => {
     amount: '',
     durationMonths: '',
     projectReport: null,
+    projectName: '',
   });
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -112,31 +114,35 @@ const LoanApplicationForm = () => {
       role: user.role,
       encrypted: true
     }
-    console.log(parm);
-    const loanRes = await axios.post("http://localhost:8080/api/loan/application/" + loanUUID, parm, {
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const loan = loanRes.data;
-    loan.email = form.email;
-    loan.loanCategory = form.loanCategory;
-    loan.durationMonths = form.durationMonths;
-
-    const formData = new FormData();
-    formData.append("loan", new Blob([JSON.stringify(loan)], { type: "application/json" }));
-    formData.append("projectReport", form.projectReport);
-
-    console.log(formData.get("loan"));
-    console.log(formData.get("projectReport"));
     
     try {
-      const updatedLoan = await axios.put("http://localhost:8080/api/loan", formData, {
+      const loanRes = await axios.post("http://localhost:8080/api/loan/application/" + loanUUID, parm, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const loan = loanRes.data;
+      loan.email = form.email;
+      loan.amount = Number(form.amount.replace(/,/g, ''));
+      loan.loanCategory = form.loanCategory;
+      loan.durationMonths = Number(form.durationMonths);
+      loan.projectName = form.projectName;
+
+      const formData = new FormData();
+      formData.append("projectReport", form.projectReport);
+
+      const uploadedFile = await axios.post("http://localhost:8080/api/loan/file/upload", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log(updatedLoan);
+      loan.projectReportPath = uploadedFile.data; 
+      const updatedLoan = await axios.put("http://localhost:8080/api/loan", loan, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    
+      navigate(`/dashboard/loan/${updatedLoan.data.loanUUID}`);
     } catch (error) {
-      alert("Please fill out all the fields.");
       console.error("Error occured: "+error);
     }
   };
@@ -242,6 +248,20 @@ const LoanApplicationForm = () => {
                 }}
               />
             </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                type="text"
+                label="Project name"
+                name="projectName"
+                value={form.projectName}
+                onChange={handleChange}
+                required
+                helperText={`Give a name to your project eg: My ${loanType} Project Loan` }
+                sx={styles.input}
+              />
+            </Grid>
             
             {/*Interest Rate*/}
             {/*
@@ -262,6 +282,7 @@ const LoanApplicationForm = () => {
             </Grid> */}
 
             {/* Project Report*/}
+            
             <Grid item xs={12}>
               <InputLabel shrink>Project Report as PDF *</InputLabel>
 
