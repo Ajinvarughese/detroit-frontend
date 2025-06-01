@@ -24,24 +24,14 @@ export const formattedDate = (date) => {
     const formattedDate = dateObj.toLocaleString('en-GB', options);  // Or 'en-US' for US-style formatting
     return formattedDate;  // e.g., "31 May 2025 at 8:25 PM"
 
-    // // If you want "31st May 2025 HH:MM AM/PM":
-    // const day = dateObj.getDate();
-    // const suffix = (day) => {
-    // if (day > 3 && day < 21) return 'th';
-    // switch (day % 10) {
-    //     case 1: return 'st';
-    //     case 2: return 'nd';
-    //     case 3: return 'rd';
-    //     default: return 'th';
-    // }
-    // };
+}
 
-    // const month = dateObj.toLocaleString('default', { month: 'long' });
-    // const year = dateObj.getFullYear();
-    // let hours = dateObj.getHours();
-    // const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-    // const ampm = hours >= 12 ? 'PM' : 'AM';
-    // hours = hours % 12 || 12;
-
-    // return `${day}${suffix(day)} ${month} ${year} ${hours}:${minutes} ${ampm}`;
+export const monthsToYears = (value) => {
+    const year = Math.floor(value / 12);
+    const yearText = year > 1 ? year + " years" : year + " year";
+    const months = value % 12;
+    const monthsText = months > 1 ? months + " months" : months + " month";
+    
+    const text = year > 0 && months > 0 ? `${yearText} and ${monthsText}` : year > 0 ? `${yearText}` : `${monthsText}`; 
+    return text;
 }

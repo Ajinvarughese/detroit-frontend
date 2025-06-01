@@ -9,7 +9,8 @@ import { PictureAsPdf } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router';
 import { getUser } from '../../hooks/LocalStorageUser';
 import axios from 'axios';
-import { getDate } from '../../hooks/CurrentDate';
+import { monthsToYears } from '../../hooks/CurrentDate';
+
 
 const loanCategory = [
   "POLLUTION_PREVENTION",
@@ -89,13 +90,7 @@ const LoanApplicationForm = () => {
         ...prev,
         [name]: value
       }));
-      const year = Math.floor(value / 12);
-      const yearText = year > 1 ? year + " years" : year + " year";
-      const months = value % 12;
-      const monthsText = months > 1 ? months + " months" : months + " month";
-      
-      const text = year > 0 && months > 0 ? `${yearText} and ${monthsText}` : year > 0 ? `${yearText}` : `${monthsText}`; 
-      setHelperText(text);
+      setHelperText(monthsToYears(value));
 
     } else {
       setForm((prev) => ({

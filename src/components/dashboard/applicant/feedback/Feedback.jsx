@@ -39,7 +39,7 @@ const Feedback = () => {
   if (isSubmitted) {
     return (
       <div className="h-screen bg-[#0e151b] flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
+        <div className="w-full max">
           <div className="bg-slate-800/80 rounded-2xl shadow-xl p-8 text-center border border-slate-700/50 backdrop-blur-sm">
             <div className="mb-6 relative">
               <div className="w-20 h-20 bg-gradient-to-br from-[#4ade80] to-green-400 rounded-full mx-auto flex items-center justify-center mb-4 shadow-lg">

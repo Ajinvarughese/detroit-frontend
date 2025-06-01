@@ -3,9 +3,11 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router";
 import { PictureAsPdf } from "@mui/icons-material";
-import { Typography, Button, Box, Breadcrumbs, Link } from "@mui/material";
+import { Typography, Button, Box, Breadcrumbs, Link, Divider } from "@mui/material";
 import { getUser } from "../../../hooks/LocalStorageUser";
-import { formattedDate } from "../../../hooks/CurrentDate";
+import { formattedDate, monthsToYears } from "../../../hooks/CurrentDate";
+import { Send } from "lucide-react";
+import { motion } from 'framer-motion';
 
 
 const AllLoans = () => {
@@ -16,13 +18,14 @@ const AllLoans = () => {
     const fetchAllLoans = async () => {
       try {
         const res = await axios.get(`http://localhost:8080/api/loan/user/${getUser("user").id}`);
-        setLoan(res.data);    
+        setLoan(res.data.reverse());    
       } catch (err) {
         console.error('Error fetching loan:', err);
       }
     };
     fetchAllLoans();
   }, [])
+  
 
   return (
     <>
@@ -50,6 +53,145 @@ const AllLoans = () => {
 }
 
 
+const LoanUpdation = () => {
+  const { id } = useParams();
+
+  const [newAmount, setNewAmount] = useState(null);
+  const [interestRate, setInterestRate] = useState(null);
+  const [duration, setDuration] = useState(null);
+  const [loan, setLoan] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchLoan = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/loan/${id}`);
+        setLoan(res.data);
+      } catch (err) {
+        console.error('Error fetching loan:', err);
+      }
+    };
+    fetchLoan();
+  }, [id]);
+
+  const handleSubmit = async () => {
+    if (!newAmount && !interestRate && !duration) {
+      alert('Please fill in a field.');
+      return;
+    }
+
+    try {
+      loan.amount = Number(newAmount.replace(/,/g, ''));
+      loan.interestRate = Number(interestRate);
+      loan.durationMonths = Number(duration);
+      await axios.put(`http://localhost:8080/api/loan/newRequest`, loan, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      setSuccess(true);
+      setInterestRate('');
+      setNewAmount('');
+      setDuration('');
+      setTimeout(() => setSuccess(false), 3000); // Auto-hide after 3 seconds
+    } catch (error) {
+      console.error('Update failed:', error);
+    }
+  };
+
+  if (loan?.status !== "PENDING") return null;
+
+  return (
+    <div className="applicant-card flex flex-col md:flex-row">
+      {/* Left Side - Loan Details */}
+      <div className="md:w-1/2 p-6">
+        <h3 className="text-2xl font-bold text-white mb-4">Loan Updation</h3>
+        <p className="text-slate-300 mb-2">Approved Amount: <span className="text-[#4ade80] font-bold">₹{loan?.amount.toLocaleString()}</span></p>
+        <p className="text-slate-300 mb-2">Interest Rate: <span className="text-[#4ade80] font-bold">{loan?.interestRate}%</span></p>
+        <p className="text-slate-300 mb-2">Duration: <span className="text-[#4ade80] font-bold">{loan?.durationMonths} months</span><span style={{ fontSize: "12px", opacity: 0.7 }}> ({monthsToYears(loan?.durationMonths)})</span></p>
+        <p className="text-slate-300 mb-2">Status: <span className={`${loan?.status === 'APPROVED' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : 'text-yellow-500'} font-bold`}>{loan?.status}</span></p>
+        <p className="text-slate-300 mb-2">Created Date: <span className="text-[#4ade80] font-bold">{formattedDate(loan?.createdAt)}</span></p>
+      </div>
+
+      <Divider sx={{
+        background: "#ccc", opacity: 0.3, borderRadius: "100%",
+        height: { xs: '1px', md: '100%' },
+        width: { xs: '100%', md: '1px' }
+      }} />
+
+      {/* Right Side - Update Inputs */}
+      <div className="w-full flex flex-col gap-5 md:w-1/2 p-6 space-y-4">
+        <h4 className="text-xl font-semibold text-white">Update Loan Details</h4>
+        <div>
+          <label className="block text-xs font-semibold text-slate-300 mb-1">Request New Amount (₹)</label>
+          <input
+            type="text"
+            value={newAmount}
+            onChange={(e) => {
+              const value = e.target.value;
+              const rawValue = value.replace(/\D/g, '');
+              const formattedValue = rawValue ? new Intl.NumberFormat('en-IN').format(rawValue) : '';
+              setNewAmount(formattedValue);
+            }}
+            placeholder="Enter new amount"
+            className="w-full px-3 py-3 mt-1 bg-slate-700/50 border border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4ade80]/50 focus:border-[#4ade80] hover:bg-slate-700/70"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-slate-300 mb-1">New Interest Rate (%)</label>
+          <input
+            type="text"
+            value={interestRate}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (isNaN(value)) return;
+              setInterestRate(value);
+            }}
+            placeholder="Enter new interest rate"
+            className="w-full px-3 py-3 mt-1 bg-slate-700/50 border border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4ade80]/50 focus:border-[#4ade80] hover:bg-slate-700/70"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-slate-300 mb-1">New Duration (months)</label>
+          <input
+            type="text"
+            value={duration}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (isNaN(value)) return;
+              setDuration(value);
+            }}
+            placeholder="Enter new duration"
+            className="w-full px-3 py-3 mt-1 bg-slate-700/50 border border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4ade80]/50 focus:border-[#4ade80] hover:bg-slate-700/70"
+          />
+          <p>{monthsToYears(duration)}</p>
+        </div>
+        
+        {/* Animated Submit Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleSubmit}
+          className="group flex w-fit items-center px-6 py-2 bg-[#4ade80] text-white rounded-lg hover:bg-green-400 text-sm font-semibold shadow-lg hover:shadow-xl"
+        >
+          <Send className="w-4 h-4 mr-2" /> Submit Update
+        </motion.button>
+
+        {/* Success Message */}
+        {success && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="text-green-400 text-sm font-semibold"
+          >
+            Loan updated successfully!
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const LoanSummary = () => { 
   const { id } = useParams();
   const [loan, setLoan] = useState(null);
@@ -67,16 +209,18 @@ const LoanSummary = () => {
       };
       fetchLoan();
   }, []);
-  
+
   return (
     <>
       {/* Loan Summary */}
       <div className="applicant-card">
+        {console.log(loan)}
         <h3>Loan Summary</h3>
         <p>Project Name:<strong> {loan?.projectName}</strong></p>
         <p><strong>Loan Amount:</strong> ₹{loan?.amount?.toLocaleString()}</p>
-        <p><strong>Status:</strong> {loan?.status}</p>
+        <p className="text-slate-300 mb-2">Status: <span className={`${loan?.status === 'APPROVED' || loan?.status === 'REPAID' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : loan?.status === 'REJECTED' ? 'text-red-500' : loan?.status === 'CLOSED' ? 'text-gray-500' :'text-yellow-500'} font-bold`}>{loan?.status}</span></p>
         <p><strong>Pending Amount:</strong> ₹{loan?.amountPending?.toLocaleString()}</p>
+        <p><strong>Created date: </strong> ₹{formattedDate(loan?.createdAt)}</p>
       </div>
 
       {/* Loan Details */}
@@ -145,7 +289,7 @@ const LoanSummary = () => {
 
 const UserLoans = ({ page }) => {
   return(
-    <Box sx={{width: "100%"}} overflow={{y: "auto"}}>
+    <Box sx={{width: "100%", marginLeft: '220px'}} overflow={{y: "auto"}}>
       {
         page === "allLoans" && (
           <Breadcrumbs sx={{margin: "30px 0px 0px 20px",color: "#ccc"}} aria-label="breadcrumb">
@@ -158,24 +302,32 @@ const UserLoans = ({ page }) => {
       }
       {
         page === "details" && (
-          <Breadcrumbs sx={{margin: "30px 0px 0px 20px",color: "#ccc"}} aria-label="breadcrumb">
-            <Link underline="hover" sx={{opacity: '0.6'}} color="inherit" href="/dashboard">
-              Home
-            </Link>
-            <Link
-              sx={{
-                opacity: '0.6'
-              }}
-              underline="hover"
-              color="inherit"
-              href="/dashboard/loan"
-            >
-              Loans
-            </Link>
-            <Typography sx={{ color: '#fff'}}>Loan details</Typography>
-          </Breadcrumbs>
+          <>
+            <Breadcrumbs sx={{margin: "30px 0px 0px 20px",color: "#ccc"}} aria-label="breadcrumb">
+              <Link underline="hover" sx={{opacity: '0.6'}} color="inherit" href="/dashboard">
+                Home
+              </Link>
+              <Link
+                sx={{
+                  opacity: '0.6'
+                }}
+                underline="hover"
+                color="inherit"
+                href="/dashboard/loan"
+              >
+                Loans
+              </Link>
+              <Typography sx={{ color: '#fff'}}>Loan details</Typography>
+            </Breadcrumbs>
+            <Box>
+              <div style={{padding: "24px"}} className="applicant-main-content">
+                <LoanUpdation />
+              </div>
+            </Box>
+          </>
         )
       }
+      
       <div className="applicant-main-content" style={{padding: "24px"}}>
         { page === "allLoans" && <AllLoans /> }
         { page === "details" && (

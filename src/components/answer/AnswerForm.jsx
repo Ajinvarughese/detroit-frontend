@@ -19,7 +19,6 @@ import { getUser } from '../hooks/LocalStorageUser';
 import { toCamelCase } from '../hooks/EnumToString';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const { Option } = Select;
 

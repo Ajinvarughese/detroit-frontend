@@ -24,7 +24,7 @@ const Sidebar = ({page, open}) => {
   const navigate = useNavigate();
   return (
     <div className="applicant-sidebar">
-      <div className="applicant-logo">MyLoans</div>
+      <div className="applicant-logo">My Loans</div>
       <div className="applicant-nav-wrapper">
         <div className="applicant-nav-links">
           {navLinks.map(link => (
