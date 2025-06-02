@@ -11,6 +11,8 @@ import {
   Legend
 } from 'chart.js';
 import './Bank.css';
+import { useNavigate } from 'react-router';
+import LoansTable from './loanTable/LoanTable';
 
 ChartJS.register(
   CategoryScale,
@@ -22,8 +24,42 @@ ChartJS.register(
   Legend
 );
 
-const Bank = () => {
-  const data = {
+const navLinks = [
+  { label: '🏠 Dashboard', path: '/dashboard', key: ['home'] },
+  { label: '📄 Loans', path: '/dashboard/loans', key: ['loans', 'loanDetails'] },
+  { label: '💳 Payments', path: '#', key: ['payments'] },
+  { label: '🔔 Notifications', path: '#', key: ['notifications'] },
+  { label: '💬 Feedback', path: '/dashboard/feedback', key: ['feedback'] }
+];
+
+const Sidebar = ({ page }) => {
+  const navigate = useNavigate();
+  return (
+    <div style={{zIndex: 1}} className="applicant-sidebar">
+      <div className="applicant-logo">Detroit SF</div>
+      <div className="applicant-nav-wrapper">
+        <div className="applicant-nav-links">
+          {navLinks.map(link => (
+            <a
+              key={link.key.join('-')} 
+              href={link.path}
+              style={link.key.includes(page) ? style.active : {}}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </div>
+      <button className="applicant-upgrade-btn" onClick={() => {
+        deleteUser();
+        navigate("/");
+      }}>Log Out</button>
+    </div>
+  )
+};
+
+const HomeDashboard = () => {
+   const data = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
     datasets: [{
       label: 'Loan Applications',
@@ -54,60 +90,42 @@ const Bank = () => {
     interaction: { mode: 'nearest', axis: 'x', intersect: false }
   };
 
-  return (
-    <div className="bank-dashboard-container">
-      <aside className="bank-sidebar">
-        <div>
-          <h1 className="bank-logo">Detroit</h1>
-          <nav className="bank-dash-nav-links">
-            <a href="#">Dashboard</a>
-            <a href="#">Analytics</a>
-            <a href="#">Messages</a>
-            <a href="#">Community</a>
-          </nav>
-        </div>
-        <div className="bank-bottom-links">
-          <a href="#">Settings</a>
-          <a href="#">Help</a>
-          <button className="bank-upgrade-btn">Log Out</button>
-        </div>
-      </aside>
+  return(
+    <main style={{ marginLeft: "220px" }} className="bank-main-content">
+        <div style={{ maxWidth: '700px' }} >
+          <section  className="bank-cards">
+            <div className="bank-card">
+              <h2>Total Customers</h2>
+              <p className="bank-value">12,132</p>
+              <p className="bank-trend up">+12% From last month</p>
+            </div>
+            <div className="bank-card">
+              <h2>Pending Applications</h2>
+              <p className="bank-value">2,982</p>
+              <p className="bank-trend down">-12% From last month</p>
+            </div>
+            <div className="bank-card">
+              <h2>Active Loans</h2>
+              <p className="bank-value">8,450</p>
+              <p className="bank-trend up">+8% From last month</p>
+            </div>
+          </section>
 
-      <main className="bank-main-content">
-        <section className="bank-cards">
-          <div className="bank-card">
-            <h2>Total Customers</h2>
-            <p className="bank-value">12,132</p>
-            <p className="bank-trend up">+12% From last month</p>
-          </div>
-          <div className="bank-card">
-            <h2>Pending Applications</h2>
-            <p className="bank-value">2,982</p>
-            <p className="bank-trend down">-12% From last month</p>
-          </div>
-          <div className="bank-card">
-            <h2>Active Loans</h2>
-            <p className="bank-value">8,450</p>
-            <p className="bank-trend up">+8% From last month</p>
-          </div>
-        </section>
-
-        <section className="bank-centered-trend">
-          <h3>Loan Trends</h3>
-          <div className="chart-wrapper">
-            <Line data={data} options={options} />
-          </div>
-        </section>
+          <section className="bank-centered-trend">
+            <h3>Loan Trends</h3>
+            <div className="chart-wrapper">
+              <Line data={data} options={options} />
+            </div>
+          </section>
+        </div>
 
         <section className="bank-top-session">
-          <h3>Mobile Session</h3>
-          <div className="bank-progress-circle"></div>
-          <div className="bank-weekly-analytics">
+          <div style={{ width: "100%" }} className="bank-weekly-analytics">
             <h4>Weekly Analytics</h4>
             <ul>
               {["Mobile", "TV", "Desktop", "iOS", "Android", "Linux"].map(item => (
                 <li key={item}>
-                  <span>{item}</span>
+                  <span style={{fontSize: "15px"}}>{item}</span>
                   <span className="bank-trend up">1,273 visits</span>
                 </li>
               ))}
@@ -115,6 +133,17 @@ const Bank = () => {
           </div>
         </section>
       </main>
+  )
+}
+
+
+const Bank = ({ page="home" }) => {
+
+  return (
+    <div className="bank-dashboard-container">
+      <Sidebar />
+      {page === "home" && <HomeDashboard />}
+      {page === "loanTable" && <LoansTable />}
     </div>
   );
 };

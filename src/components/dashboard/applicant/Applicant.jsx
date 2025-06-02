@@ -20,7 +20,7 @@ const navLinks = [
   { label: '🔔 Notifications', path: '#', key: ['notifications'] },
   { label: '💬 Feedback', path: '/dashboard/feedback', key: ['feedback'] }
 ];
-const Sidebar = ({page, open}) => {
+const Sidebar = ({ page }) => {
   const navigate = useNavigate();
   return (
     <div className="applicant-sidebar">

@@ -59,6 +59,7 @@ const LoanUpdation = () => {
   const [newAmount, setNewAmount] = useState(null);
   const [interestRate, setInterestRate] = useState(null);
   const [duration, setDuration] = useState(null);
+  const [status, setStatus] = useState(null);
   const [loan, setLoan] = useState(null);
   const [success, setSuccess] = useState(false);
 
@@ -67,12 +68,13 @@ const LoanUpdation = () => {
       try {
         const res = await axios.get(`http://localhost:8080/api/loan/${id}`);
         setLoan(res.data);
+        setStatus(res.data.status);
       } catch (err) {
         console.error('Error fetching loan:', err);
       }
     };
     fetchLoan();
-  }, [id]);
+  }, []);
 
   const handleSubmit = async () => {
     if (!newAmount && !interestRate && !duration) {
@@ -84,10 +86,11 @@ const LoanUpdation = () => {
       loan.amount = Number(newAmount.replace(/,/g, ''));
       loan.interestRate = Number(interestRate);
       loan.durationMonths = Number(duration);
-      await axios.put(`http://localhost:8080/api/loan/newRequest`, loan, {
+      const res = await axios.put(`http://localhost:8080/api/loan/newRequest`, loan, {
         headers: { 'Content-Type': 'application/json' }
       });
-      
+
+      setStatus(res.data.status);
       setSuccess(true);
       setInterestRate('');
       setNewAmount('');
@@ -98,7 +101,7 @@ const LoanUpdation = () => {
     }
   };
 
-  if (loan?.status !== "PENDING") return null;
+  if (status !== "PENDING") return null;
 
   return (
     <div className="applicant-card flex flex-col md:flex-row">
@@ -212,15 +215,14 @@ const LoanSummary = () => {
 
   return (
     <>
-      {/* Loan Summary */}
+      { /* Loan Summary */ }
       <div className="applicant-card">
-        {console.log(loan)}
         <h3>Loan Summary</h3>
         <p>Project Name:<strong> {loan?.projectName}</strong></p>
         <p><strong>Loan Amount:</strong> ₹{loan?.amount?.toLocaleString()}</p>
         <p className="text-slate-300 mb-2">Status: <span className={`${loan?.status === 'APPROVED' || loan?.status === 'REPAID' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : loan?.status === 'REJECTED' ? 'text-red-500' : loan?.status === 'CLOSED' ? 'text-gray-500' :'text-yellow-500'} font-bold`}>{loan?.status}</span></p>
         <p><strong>Pending Amount:</strong> ₹{loan?.amountPending?.toLocaleString()}</p>
-        <p><strong>Created date: </strong> ₹{formattedDate(loan?.createdAt)}</p>
+        <p><strong>Created date: </strong> {formattedDate(loan?.createdAt)}</p>
       </div>
 
       {/* Loan Details */}

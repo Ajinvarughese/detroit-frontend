@@ -22,6 +22,7 @@ function App() {
         <Route path='/questionnaire/editor/:id' element={<QuestionnaireEditor />} />
         <Route path='/questionnaire' element={<Questionnaire />} />
         <Route path='/dashboard' element={<Bank />} />
+        <Route path='/dashboard/loans' element={<Bank page='loanTable' />} />
         <Route path='/questionnaire/preview/:id' element={<AnswerForm preview />} />
       </Routes>
     }

@@ -38,8 +38,8 @@ const Feedback = () => {
 
   if (isSubmitted) {
     return (
-      <div className="h-screen bg-[#0e151b] flex items-center justify-center p-4">
-        <div className="w-full max">
+      <div style={{marginLeft: "220px", padding: "3rem"}} className="h-screen bg-[#121c24] flex item-center justify-center w-full p4">
+        <div className="max-w-2xl">
           <div className="bg-slate-800/80 rounded-2xl shadow-xl p-8 text-center border border-slate-700/50 backdrop-blur-sm">
             <div className="mb-6 relative">
               <div className="w-20 h-20 bg-gradient-to-br from-[#4ade80] to-green-400 rounded-full mx-auto flex items-center justify-center mb-4 shadow-lg">
@@ -65,11 +65,9 @@ const Feedback = () => {
   }
 
   return (
-    <div className="h-screen bg-[#121c24] flex w-full">
-      <div className="flex flex-col w-full h-full p-4">
-        <div className="flex-1 flex items-center justify-center py-2 px-2">
-          <div className="w-full max-w-2xl h-full">
-            <div className="bg-slate-800/60 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-auto flex flex-col h-full max-h-screen">
+    <div style={{marginLeft: "220px", padding: "3rem"}} className="h-screen bg-[#121c24] flex item-center justify-center w-full">
+        <div  className="max-w-2xl h-full">
+            <div className="bg-slate-800/60 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 overflow-auto flex flex-col h-full max-h-screen flex">
               {/* Header */}
               <div className="bg-slate-800/80 px-6 py-4 border-b border-slate-700/50">
                 <div className='flex items-center' >
@@ -84,7 +82,9 @@ const Feedback = () => {
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-auto p-4 space-y-6">
+              <div style={{'::webkite-scrollbar': {
+                display: 'none'
+              }}} className="flex-1 overflow-auto p-4 space-y-6">
                 {/* Title */}
                 <div className="group">
                   <label htmlFor="title" className="block text-xs font-semibold text-slate-300 mb-2">
@@ -174,8 +174,7 @@ const Feedback = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    
   );
 };
 
