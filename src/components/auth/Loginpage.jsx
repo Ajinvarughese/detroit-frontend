@@ -97,7 +97,7 @@ const Loginpage = ({ user }) => {
       email: registerData.email,
       password: registerData.password,
       address: registerData.address,
-      role: user,
+      role: registerData.role,
       organization: registerData.organization,
       subRole: user === "APPLICANT" ? registerData.role : null
     };

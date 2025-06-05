@@ -37,6 +37,12 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
         name: 'Questionnaire',
         link: '/questionnaire',
       },
+    ],
+    admin: [
+      {
+        name: 'Dashboard',
+        link: '/admin'
+      },
     ]
   }
   
@@ -46,6 +52,8 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
     mapUser = navList.bank;
   }else if(user.role === 'APPLICANT') {
     mapUser = navList.applicant;
+  }else if(user.role === 'ADMIN') {
+    mapUser = navList.admin;
   }
 
 
