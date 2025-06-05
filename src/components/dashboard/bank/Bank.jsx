@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -13,6 +13,7 @@ import {
 import './Bank.css';
 import { useNavigate } from 'react-router';
 import LoansTable from './loanTable/LoanTable';
+import axios from 'axios';
 
 ChartJS.register(
   CategoryScale,
@@ -59,6 +60,20 @@ const Sidebar = ({ page }) => {
 };
 
 const HomeDashboard = () => {
+  const [loans, setLoans] = useState(null);
+  const [users, setUsers] = useState(null);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchAllLoans = async () => {
+      const userRes = await axios.get("http://localhost:8080/api/user");
+      setUsers(userRes.data);
+      console.log(userRes.data);
+      const loanRes = await axios.get("http://localhost:8080/api/loan");
+      setLoans(loanRes.data);
+    }
+    fetchAllLoans();
+  }, []);
+
    const data = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
     datasets: [{
@@ -96,12 +111,13 @@ const HomeDashboard = () => {
           <section  className="bank-cards">
             <div className="bank-card">
               <h2>Total Customers</h2>
-              <p className="bank-value">12,132</p>
+              {console.log(users)}
+              <p className="bank-value">{loans?.length}</p>
               <p className="bank-trend up">+12% From last month</p>
             </div>
             <div className="bank-card">
               <h2>Pending Applications</h2>
-              <p className="bank-value">2,982</p>
+              <p className="bank-value">120</p>
               <p className="bank-trend down">-12% From last month</p>
             </div>
             <div className="bank-card">

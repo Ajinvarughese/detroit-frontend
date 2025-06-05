@@ -135,7 +135,7 @@ const LoansTable = () => {
                         <td className="px-4 py-3">{loan?.user.id}</td>
                         <td className="px-4 py-3">{loan?.user.fullName}</td>
                         <td className="px-4 py-3">{formattedDate(loan?.updatedAt)}</td>
-                        <td className={`px-4 py-3 ${loan?.status === 'APPROVED' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : loan?.status === 'REJECTED' ? 'text-red-500' : loan?.status === "CLOSED" ? 'text-gray-500' : 'text-yellow-500'}`}>{loan?.status}</td>
+                        <td className={`px-4 py-3 ${loan?.status === 'APPROVED' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : loan?.status === 'REJECTED' ? 'text-red-500' : loan?.status === "CLOSED" ? 'text-gray          -500' : 'text-yellow-500'}`}>{loan?.status}</td>
                         <td className="px-4 py-3">{loan?.amount || '—'}</td>
                         <td className="px-4 py-3">{loan?.interestRate || '—'}</td>
                         <td className="px-4 py-3 text-blue-400 underline">Expand</td>

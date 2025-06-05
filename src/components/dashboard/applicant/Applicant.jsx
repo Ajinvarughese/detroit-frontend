@@ -5,6 +5,7 @@ import UserLoans from './userLoans/UserLoans';
 import Feedback from './feedback/Feedback';
 import { deleteUser } from '../../hooks/LocalStorageUser';
 import { useNavigate } from 'react-router';
+import Bank from '../bank/Bank';
 
 const style = {
   active: {
@@ -54,7 +55,7 @@ const Applicant = ({ page="home" }) => {
     <div className='applicant-dashboard'>
       <div className="applicant-dashboard-container">
         <Sidebar page={page} />
-          {page === 'home' && <Dashboard />}
+          {page === 'home' && <UserLoans />}
           {page === 'feedback' && <Feedback />}
           {page === 'loan' &&  <UserLoans page="allLoans" />}
           {page === 'loanDetails' &&  <UserLoans page="details" />}

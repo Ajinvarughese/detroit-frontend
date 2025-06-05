@@ -23,6 +23,7 @@ function App() {
         <Route path='/questionnaire' element={<Questionnaire />} />
         <Route path='/dashboard' element={<Bank />} />
         <Route path='/dashboard/loans' element={<Bank page='loanTable' />} />
+        <Route path='/dashboard/feedback' element={ <Bank page="feedback" /> } />
         <Route path='/questionnaire/preview/:id' element={<AnswerForm preview />} />
       </Routes>
     }

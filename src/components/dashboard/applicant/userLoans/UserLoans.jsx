@@ -76,6 +76,19 @@ const LoanUpdation = () => {
     fetchLoan();
   }, []);
 
+  const handleApproved = async () => {
+    console.log(loan);
+    try {
+      const approvedRes = await axios.put("http://localhost:8080/api/loan/updateRequest", loan, {
+        headers: { 'Content-Type' : 'application/json' }
+      })
+      console.log(approvedRes);
+      
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const handleSubmit = async () => {
     if (!newAmount && !interestRate && !duration) {
       alert('Please fill in a field.');
@@ -113,6 +126,11 @@ const LoanUpdation = () => {
         <p className="text-slate-300 mb-2">Duration: <span className="text-[#4ade80] font-bold">{loan?.durationMonths} months</span><span style={{ fontSize: "12px", opacity: 0.7 }}> ({monthsToYears(loan?.durationMonths)})</span></p>
         <p className="text-slate-300 mb-2">Status: <span className={`${loan?.status === 'APPROVED' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : 'text-yellow-500'} font-bold`}>{loan?.status}</span></p>
         <p className="text-slate-300 mb-2">Created Date: <span className="text-[#4ade80] font-bold">{formattedDate(loan?.createdAt)}</span></p>
+
+        <button
+          onClick={handleApproved}
+          className="group cursor-pointer flex w-fit items-center px-6 py-2 bg-[#4ade80] text-white rounded-lg hover:bg-green-400 text-sm font-semibold shadow-lg hover:shadow-xl"
+        >Accept Loan</button>
       </div>
 
       <Divider sx={{
