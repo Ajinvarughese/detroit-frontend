@@ -79,10 +79,10 @@ const LoanUpdation = () => {
   const handleApproved = async () => {
     console.log(loan);
     try {
-      const approvedRes = await axios.put("http://localhost:8080/api/loan/updateRequest", loan, {
-        headers: { 'Content-Type' : 'application/json' }
-      })
-      console.log(approvedRes);
+      //const approvedRes = await axios.put("http://localhost:8080/api/loan/updateRequest", loan, {
+      //  headers: { 'Content-Type' : 'application/json' }
+      //})
+      //console.log(approvedRes);
       
     } catch (error) {
       console.error(error);
@@ -96,9 +96,13 @@ const LoanUpdation = () => {
     }
 
     try {
-      loan.amount = Number(newAmount.replace(/,/g, ''));
-      loan.interestRate = Number(interestRate);
-      loan.durationMonths = Number(duration);
+      console.log(newAmount, interestRate, duration);
+      
+      loan.amount = newAmount === null ? loan.amount : Number(newAmount.replace(/,/g, ''));
+      loan.interestRate = interestRate === null ? loan.interestRate : Number(interestRate);
+      loan.durationMonths = duration === null ? loan.durationMonths : Number(duration);
+      
+      console.log(loan);
       const res = await axios.put(`http://localhost:8080/api/loan/newRequest`, loan, {
         headers: { 'Content-Type': 'application/json' }
       });

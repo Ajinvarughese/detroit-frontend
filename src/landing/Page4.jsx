@@ -3,11 +3,13 @@ import { Row, Col } from 'antd';
 import QueueAnim from 'rc-queue-anim';
 import OverPack from 'rc-scroll-anim/lib/ScrollOverPack';
 import { page4 } from './data';
+import { useNavigate } from 'react-router';
 
 export default function Page4() {
-  const children = page4.children.map((img, i) => (
-    <Col md={6} xs={24} key={i.toString()} className="page4-item">
-      <img src={img} alt="img" />
+  const navigate =  useNavigate();
+  const children = page4.children.map((item, i) => (
+    <Col onClick={() => window.location.href=item.link} md={6} xs={24} key={i.toString()} className="page4-item">
+      <img src={item.icon} alt="img" />
     </Col>
   ));
   return (
