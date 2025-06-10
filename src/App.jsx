@@ -12,6 +12,7 @@ import AnswerForm from './components/answer/AnswerForm';
 import LoanApplicationForm from './components/loan/loanApplication/LoanApplicationForm';
 import AdminDashboard from './components/dashboard/admin/AdminDashboard.jsx';
 import RuleEditor from './components/dashboard/admin/RuleEditor.jsx'
+import Rule from './components/rule/Rule';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path='/dashboard/loans' element={<Bank page='loanTable' />} />
         <Route path='/dashboard/feedback' element={ <Bank page="feedback" /> } />
         <Route path='/questionnaire/preview/:id' element={<AnswerForm preview />} />
+        <Route path='/rules' element={<Rule />} />
       </Routes>
     }
     {

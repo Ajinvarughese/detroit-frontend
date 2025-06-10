@@ -14,6 +14,7 @@ import './Bank.css';
 import { useNavigate } from 'react-router';
 import LoansTable from './loanTable/LoanTable';
 import axios from 'axios';
+import Feedback from '../applicant/feedback/Feedback';
 
 ChartJS.register(
   CategoryScale,
@@ -160,6 +161,7 @@ const Bank = ({ page="home" }) => {
       <Sidebar />
       {page === "home" && <HomeDashboard />}
       {page === "loanTable" && <LoansTable />}
+      {page === "feedback" && <Feedback />}
     </div>
   );
 };

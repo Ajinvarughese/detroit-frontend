@@ -97,7 +97,7 @@ const Loginpage = ({ user }) => {
       email: registerData.email,
       password: registerData.password,
       address: registerData.address,
-      role: registerData.role,
+      role: user === "APPLICANT" ? user : registerData.role,
       organization: registerData.organization,
       subRole: user === "APPLICANT" ? registerData.role : null
     };
@@ -125,7 +125,7 @@ const Loginpage = ({ user }) => {
   };
 
   return (
-    <div className="container">
+    <div className="container-login">
       <div style={{
       width: '100%',
       maxWidth: isRegistration ? '500px' : '400px'
@@ -265,7 +265,7 @@ const Loginpage = ({ user }) => {
                   <div className="input-box">
                     <select
                       name="role"
-                      value={registerData.role}
+                      value={registerData.subRole}
                       onChange={handleRegisterChange}
                       required
                     >

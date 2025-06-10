@@ -125,7 +125,6 @@ export const page4 = {
       link: 'https://alipay.com',
     }  
   ],
-  
 };
 
 export const footer = [

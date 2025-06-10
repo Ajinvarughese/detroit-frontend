@@ -8,8 +8,17 @@ const RuleEditor = () => {
   const [editingRuleId, setEditingRuleId] = useState(null);
   const [editedData, setEditedData] = useState({});
 
+  const fetchRules = async () => {
+    try {
+      const res = await axios.get('http://localhost:8080/api/rules');
+      setRules(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    axios.get('http://localhost:8080/api/rules').then(res => setRules(res.data));
+    fetchRules();
   }, []);
 
   const handleEdit = (rule) => {
@@ -21,11 +30,19 @@ const RuleEditor = () => {
     setEditedData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = (id) => {
-    axios.put(`http://localhost:8080/api/rules/${id}`, editedData).then(res => {
+  const handleSave = async () => {
+    try {
+      const res = await axios.put(`http://localhost:8080/api/rules`, editedData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
       setRules(rules.map(rule => (rule.id === id ? res.data : rule)));
+    } catch (error) {
+      console.error(error);
+    } finally {
       setEditingRuleId(null);
-    });
+    }
   };
 
   return (
@@ -54,7 +71,7 @@ const RuleEditor = () => {
                     />
                   </div>
                 ))}
-                <button onClick={() => handleSave(rule.id)} className="bg-green-600 text-white px-4 py-2 rounded mr-2">
+                <button onClick={() => handleSave()} className="bg-green-600 text-white px-4 py-2 rounded mr-2">
                   Save
                 </button>
                 <button onClick={() => setEditingRuleId(null)} className="bg-gray-500 text-white px-4 py-2 rounded">

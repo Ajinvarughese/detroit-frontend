@@ -8,6 +8,8 @@ import { getUser } from "../../../hooks/LocalStorageUser";
 import { formattedDate, monthsToYears } from "../../../hooks/CurrentDate";
 import { Send } from "lucide-react";
 import { motion } from 'framer-motion';
+import { amountFormat } from "../../../hooks/Formatter";
+import { convertToString } from "../../../hooks/EnumToString";
 
 
 const AllLoans = () => {
@@ -24,7 +26,7 @@ const AllLoans = () => {
       }
     };
     fetchAllLoans();
-  }, [])
+  }, []);
   
 
   return (
@@ -57,7 +59,6 @@ const LoanUpdation = () => {
   const { id } = useParams();
 
   const [newAmount, setNewAmount] = useState(null);
-  const [interestRate, setInterestRate] = useState(null);
   const [duration, setDuration] = useState(null);
   const [status, setStatus] = useState(null);
   const [loan, setLoan] = useState(null);
@@ -79,10 +80,10 @@ const LoanUpdation = () => {
   const handleApproved = async () => {
     console.log(loan);
     try {
-      //const approvedRes = await axios.put("http://localhost:8080/api/loan/updateRequest", loan, {
-      //  headers: { 'Content-Type' : 'application/json' }
-      //})
-      //console.log(approvedRes);
+      const approvedRes = await axios.put("http://localhost:8080/api/loan/updateRequest", loan, {
+       headers: { 'Content-Type' : 'application/json' }
+      })
+      console.log(approvedRes);
       
     } catch (error) {
       console.error(error);
@@ -90,26 +91,21 @@ const LoanUpdation = () => {
   }
 
   const handleSubmit = async () => {
-    if (!newAmount && !interestRate && !duration) {
+    if (!newAmount && !duration) {
       alert('Please fill in a field.');
       return;
     }
 
     try {
-      console.log(newAmount, interestRate, duration);
-      
-      loan.amount = newAmount === null ? loan.amount : Number(newAmount.replace(/,/g, ''));
-      loan.interestRate = interestRate === null ? loan.interestRate : Number(interestRate);
+      loan.amount = newAmount === null ? loan.amount : amountFormat(newAmount, false);
       loan.durationMonths = duration === null ? loan.durationMonths : Number(duration);
       
-      console.log(loan);
       const res = await axios.put(`http://localhost:8080/api/loan/newRequest`, loan, {
         headers: { 'Content-Type': 'application/json' }
       });
 
       setStatus(res.data.status);
       setSuccess(true);
-      setInterestRate('');
       setNewAmount('');
       setDuration('');
       setTimeout(() => setSuccess(false), 3000); // Auto-hide after 3 seconds
@@ -125,7 +121,7 @@ const LoanUpdation = () => {
       {/* Left Side - Loan Details */}
       <div className="md:w-1/2 p-6">
         <h3 className="text-2xl font-bold text-white mb-4">Loan Updation</h3>
-        <p className="text-slate-300 mb-2">Approved Amount: <span className="text-[#4ade80] font-bold">₹{loan?.amount.toLocaleString()}</span></p>
+        <p className="text-slate-300 mb-2">Approved Amount: <span className="text-[#4ade80] font-bold">₹{amountFormat(loan?.amount)}</span></p>
         <p className="text-slate-300 mb-2">Interest Rate: <span className="text-[#4ade80] font-bold">{loan?.interestRate}%</span></p>
         <p className="text-slate-300 mb-2">Duration: <span className="text-[#4ade80] font-bold">{loan?.durationMonths} months</span><span style={{ fontSize: "12px", opacity: 0.7 }}> ({monthsToYears(loan?.durationMonths)})</span></p>
         <p className="text-slate-300 mb-2">Status: <span className={`${loan?.status === 'APPROVED' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : 'text-yellow-500'} font-bold`}>{loan?.status}</span></p>
@@ -153,25 +149,9 @@ const LoanUpdation = () => {
             value={newAmount}
             onChange={(e) => {
               const value = e.target.value;
-              const rawValue = value.replace(/\D/g, '');
-              const formattedValue = rawValue ? new Intl.NumberFormat('en-IN').format(rawValue) : '';
-              setNewAmount(formattedValue);
+              setNewAmount(amountFormat(value));
             }}
             placeholder="Enter new amount"
-            className="w-full px-3 py-3 mt-1 bg-slate-700/50 border border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4ade80]/50 focus:border-[#4ade80] hover:bg-slate-700/70"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">New Interest Rate (%)</label>
-          <input
-            type="text"
-            value={interestRate}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (isNaN(value)) return;
-              setInterestRate(value);
-            }}
-            placeholder="Enter new interest rate"
             className="w-full px-3 py-3 mt-1 bg-slate-700/50 border border-slate-600 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4ade80]/50 focus:border-[#4ade80] hover:bg-slate-700/70"
           />
         </div>
@@ -226,6 +206,7 @@ const LoanSummary = () => {
       const fetchLoan = async () => {
       try {
           const res = await axios.get(`http://localhost:8080/api/loan/${id}`);
+          console.log(res.data);
           setLoan(res.data);
           setPayments(res.data.payments || []);
       } catch (err) {
@@ -241,16 +222,16 @@ const LoanSummary = () => {
       <div className="applicant-card">
         <h3>Loan Summary</h3>
         <p>Project Name:<strong> {loan?.projectName}</strong></p>
-        <p><strong>Loan Amount:</strong> ₹{loan?.amount?.toLocaleString()}</p>
+        <p><strong>Loan Amount:</strong> ₹{amountFormat(loan?.amount)}</p>
         <p className="text-slate-300 mb-2">Status: <span className={`${loan?.status === 'APPROVED' || loan?.status === 'REPAID' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : loan?.status === 'REJECTED' ? 'text-red-500' : loan?.status === 'CLOSED' ? 'text-gray-500' :'text-yellow-500'} font-bold`}>{loan?.status}</span></p>
-        <p><strong>Pending Amount:</strong> ₹{loan?.amountPending?.toLocaleString()}</p>
+        <p><strong>Pending Amount:</strong> ₹{amountFormat(loan?.amountPending)}</p>
         <p><strong>Created date: </strong> {formattedDate(loan?.createdAt)}</p>
       </div>
 
       {/* Loan Details */}
       <div className="applicant-card">
         <h3>Loan Details</h3>
-        <p><strong>Category:</strong> {loan?.loanCategory}</p>
+        <p><strong>Category:</strong> {convertToString(loan?.loanCategory ?? '')}</p>
         <p><strong>Tenure:</strong> {loan?.durationMonths} months</p>
         <p><strong>Interest Rate:</strong> {loan?.interestRate ? loan.interestRate+"%" : '' }</p>
         <p><strong>Start Date:</strong> {loan?.loanStartDate?.split('T')[0]}</p>
