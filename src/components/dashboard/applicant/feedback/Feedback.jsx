@@ -1,61 +1,69 @@
 import React, { useState } from 'react';
 import { Send, Paperclip, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
+import { getUser } from "../../../hooks/LocalStorageUser";
 
 const Feedback = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [attachment, setAttachment] = useState(null);
+  const [documentUrl, setDocumentUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-const handleSubmit = async () => {
-  if (!title.trim() || !description.trim()) {
-    alert('Please fill in all required fields.');
-    return;
-  }
-
-  setIsSubmitting(true);
-  let documentUrl = null;
-
-  try {
-    // 1. Upload the file first if attached
-    if (attachment) {
-      const fileData = new FormData();
-      fileData.append("file", attachment);
-
-      const uploadRes = await axios.post("http://localhost:8080/api/feedback/file/upload", fileData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      documentUrl = uploadRes.data.documentUrl || uploadRes.data.url; // Adjust key if different
+  const handleSubmit = async () => {
+    if (!title.trim() || !description.trim()) {
+      alert('Please fill in all required fields.');
+      return;
     }
 
-    // 2. Now send feedback with optional documentUrl
-    const feedbackData = {
-      title,
-      description,
-      ...(documentUrl && { documentUrl })  // Add only if exists
-    };
+    setIsSubmitting(true);
 
-    await axios.post("http://localhost:8080/api/feedback", feedbackData, {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    try {
+      let uploadedUrl = '';
 
-    // 3. Success state handling
-    setIsSubmitted(true);
-    setTitle('');
-    setDescription('');
-    setAttachment(null);
-  } catch (error) {
-    console.error('Submission failed:', error);
-    alert('Error submitting feedback. Please try again.');
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+      // 1. Upload the file if attached
+      if (attachment) {
+        const fileData = new FormData();
+        fileData.append("document", attachment);
+
+        const uploadRes = await axios.post("http://localhost:8080/api/feedback/file/upload", fileData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        uploadedUrl = uploadRes.data; // directly use this
+      }
+
+      // 2. Prepare feedback data with uploadedUrl
+      const feedbackData = {
+        title,
+        user: {
+          id: getUser().id
+        },
+        description,
+        ...(uploadedUrl && { documentUrl: uploadedUrl }),
+      };
+
+      // 3. Submit feedback
+      await axios.post("http://localhost:8080/api/feedback", feedbackData, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      // 4. Success state handling
+      setIsSubmitted(true);
+      setTitle('');
+      setDescription('');
+      setAttachment(null);
+      setDocumentUrl(''); // optional
+    } catch (error) {
+      console.error('Submission failed:', error);
+      alert('Error submitting feedback. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
