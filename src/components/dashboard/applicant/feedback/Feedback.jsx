@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Paperclip, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import axios from 'axios';
 
 const Feedback = () => {
   const [title, setTitle] = useState('');
@@ -8,26 +9,53 @@ const Feedback = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!title.trim() || !description.trim()) {
-      alert('Please fill in all required fields.');
-      return;
+const handleSubmit = async () => {
+  if (!title.trim() || !description.trim()) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  setIsSubmitting(true);
+  let documentUrl = null;
+
+  try {
+    // 1. Upload the file first if attached
+    if (attachment) {
+      const fileData = new FormData();
+      fileData.append("file", attachment);
+
+      const uploadRes = await axios.post("http://localhost:8080/api/feedback/file/upload", fileData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      documentUrl = uploadRes.data.documentUrl || uploadRes.data.url; // Adjust key if different
     }
 
-    setIsSubmitting(true);
+    // 2. Now send feedback with optional documentUrl
+    const feedbackData = {
+      title,
+      description,
+      ...(documentUrl && { documentUrl })  // Add only if exists
+    };
 
-    setTimeout(() => {
-      setIsSubmitted(true);
-      setTitle('');
-      setDescription('');
-      setAttachment(null);
-      setIsSubmitting(false);
+    await axios.post("http://localhost:8080/api/feedback", feedbackData, {
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-      setTimeout(() => {
-        setIsSubmitted(false);
-      }, 5000);
-    }, 2000);
-  };
+    // 3. Success state handling
+    setIsSubmitted(true);
+    setTitle('');
+    setDescription('');
+    setAttachment(null);
+  } catch (error) {
+    console.error('Submission failed:', error);
+    alert('Error submitting feedback. Please try again.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
