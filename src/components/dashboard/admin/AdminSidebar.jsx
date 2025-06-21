@@ -1,9 +1,10 @@
 import { Cog8ToothIcon, HomeIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
+import { deleteUser } from "../../hooks/LocalStorageUser";
 
 const AdminSidebar = () => {
   const location = useLocation();
-
+  const navigate = useNavigate();
   const linkClass = (path) =>
     `flex items-center gap-2 p-3 rounded-md hover:bg-blue-800 transition ${
       location.pathname === path ? 'bg-blue-700' : ''
@@ -21,7 +22,10 @@ const AdminSidebar = () => {
           <PencilSquareIcon className="h-5 w-5" />
           Rule Editor
         </Link>
-        <Link to="/admin/settings" className={linkClass('/admin/settings')}>
+        <Link className={linkClass('/admin/settings')} onClick={() => {
+          deleteUser();
+          navigate("/")
+        }}>
           <Cog8ToothIcon className="h-5 w-5" />
           Settings
         </Link>

@@ -9,7 +9,7 @@ import { formattedDate, monthsToYears } from "../../../hooks/CurrentDate";
 import { Send } from "lucide-react";
 import { motion } from 'framer-motion';
 import { amountFormat } from "../../../hooks/Formatter";
-import { convertToString } from "../../../hooks/EnumToString";
+import { convertToString, toCamelCase } from "../../../hooks/EnumToString";
 
 
 const AllLoans = () => {
@@ -64,8 +64,7 @@ const LoanUpdation = () => {
   const [loan, setLoan] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  useEffect(() => {
-    const fetchLoan = async () => {
+  const fetchLoan = async () => {
       try {
         const res = await axios.get(`http://localhost:8080/api/loan/${id}`);
         setLoan(res.data);
@@ -74,6 +73,7 @@ const LoanUpdation = () => {
         console.error('Error fetching loan:', err);
       }
     };
+  useEffect(() => {
     fetchLoan();
   }, []);
 
@@ -88,6 +88,18 @@ const LoanUpdation = () => {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  const handleClose = async () => {
+    const data = {
+      id: loan.id,
+      status: "CLOSED"
+    }
+    const res = await axios.put(`http://localhost:8080/api/loan/status`,data, {
+      headers: { 'Content-Type': 'application/json'}
+    });
+    fetchLoan();
+    console.log(res.data);
   }
 
   const handleSubmit = async () => {
@@ -127,10 +139,16 @@ const LoanUpdation = () => {
         <p className="text-slate-300 mb-2">Status: <span className={`${loan?.status === 'APPROVED' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : 'text-yellow-500'} font-bold`}>{loan?.status}</span></p>
         <p className="text-slate-300 mb-2">Created Date: <span className="text-[#4ade80] font-bold">{formattedDate(loan?.createdAt)}</span></p>
 
-        <button
+        <div className="flex gap-4">
+          <button
           onClick={handleApproved}
           className="group cursor-pointer flex w-fit items-center px-6 py-2 bg-[#4ade80] text-white rounded-lg hover:bg-green-400 text-sm font-semibold shadow-lg hover:shadow-xl"
         >Accept Loan</button>
+        <button
+          onClick={handleClose}
+          className="group cursor-pointer flex w-fit items-center px-6 py-2 bg-gray-400 text-white rounded-lg hover:bg-green-400 text-sm font-semibold shadow-lg hover:shadow-xl"
+        >Close Loan</button>
+        </div>
       </div>
 
       <Divider sx={{
@@ -199,6 +217,7 @@ const LoanUpdation = () => {
 
 const LoanSummary = () => { 
   const { id } = useParams();
+  const navigate = useNavigate();
   const [loan, setLoan] = useState(null);
   const [payments, setPayments] = useState([]);
 
@@ -226,6 +245,14 @@ const LoanSummary = () => {
         <p className="text-slate-300 mb-2">Status: <span className={`${loan?.status === 'APPROVED' || loan?.status === 'REPAID' ? 'text-[#4ade80]' : loan?.status === 'DISBURSED' ? 'text-[#9D00FF]' : loan?.status === 'REJECTED' ? 'text-red-500' : loan?.status === 'CLOSED' ? 'text-gray-500' :'text-yellow-500'} font-bold`}>{loan?.status}</span></p>
         <p><strong>Pending Amount:</strong> ₹{amountFormat(loan?.amountPending)}</p>
         <p><strong>Created date: </strong> {formattedDate(loan?.createdAt)}</p>
+        {
+          loan?.status === "CREATED" && (
+            <button
+              onClick={() => navigate(`/loan/application/${toCamelCase(loan.loanCategory)}/${loan.loanUUID}`)}
+              className="group cursor-pointer flex w-fit items-center px-6 py-2 bg-[#4ade80] text-white rounded-lg hover:bg-green-400 text-sm font-semibold shadow-lg hover:shadow-xl"
+            >Finish Application</button>
+          )
+        }
       </div>
 
       {/* Loan Details */}

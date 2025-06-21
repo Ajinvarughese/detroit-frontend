@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router';
 import LoansTable from './loanTable/LoanTable';
 import axios from 'axios';
 import Feedback from '../applicant/feedback/Feedback';
+import Payment from './payments/payment';
 
 ChartJS.register(
   CategoryScale,
@@ -29,8 +30,7 @@ ChartJS.register(
 const navLinks = [
   { label: '🏠 Dashboard', path: '/dashboard', key: ['home'] },
   { label: '📄 Loans', path: '/dashboard/loans', key: ['loans', 'loanDetails'] },
-  { label: '💳 Payments', path: '#', key: ['payments'] },
-  { label: '🔔 Notifications', path: '#', key: ['notifications'] },
+  { label: '💳 Payments', path: '/dashboard/payment', key: ['payments'] },
   { label: '💬 Feedback', path: '/dashboard/feedback', key: ['feedback'] }
 ];
 
@@ -162,6 +162,7 @@ const Bank = ({ page="home" }) => {
       {page === "home" && <HomeDashboard />}
       {page === "loanTable" && <LoansTable />}
       {page === "feedback" && <Feedback />}
+      {page === "payment" && <Payment />}
     </div>
   );
 };

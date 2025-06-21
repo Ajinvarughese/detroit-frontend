@@ -25,7 +25,7 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
       },
       {
         name: 'Dashboard',
-        link: '/dashboard'
+        link: '/dashboard/loan'
       },
     ],
     bank: [
@@ -37,6 +37,10 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
         name: 'Questionnaire',
         link: '/questionnaire',
       },
+      {
+        name: 'Rules',
+        link: '/rules'
+      }
     ],
     admin: [
       {

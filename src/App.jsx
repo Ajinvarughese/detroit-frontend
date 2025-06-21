@@ -27,6 +27,7 @@ function App() {
         <Route path='/dashboard' element={<Bank />} />
         <Route path='/dashboard/loans' element={<Bank page='loanTable' />} />
         <Route path='/dashboard/feedback' element={ <Bank page="feedback" /> } />
+        <Route path='/dashboard/payment' element={<Bank page='payment' />} />
         <Route path='/questionnaire/preview/:id' element={<AnswerForm preview />} />
         <Route path='/rules' element={<Rule />} />
       </Routes>

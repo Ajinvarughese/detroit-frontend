@@ -1,5 +1,5 @@
 // src/pages/AdminDashboard.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Chart as ChartJS,
   LineElement,
@@ -12,12 +12,40 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import AdminSidebar from './AdminSidebar';
+import axios from 'axios';
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend, Filler);
 
 
 
 const AdminDashboard = () => {
+
+
+  const [loanStats, setLoanStats] = useState({
+    created: 0,
+    approved: 0,
+    rejected: 0,
+  });
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/api/loan")
+      .then((res) => {
+        const data = res.data;
+
+        const rejectedStatuses = ["REJECTED", "CLOSED"];
+        const approvedStatuses = ["APPROVED", "DISBURSED", "REPAID"];
+
+        const rejected = data.filter((loan) => rejectedStatuses.includes(loan.status)).length;
+        const approved = data.filter((loan) => approvedStatuses.includes(loan.status)).length;
+        const created = data.length;
+
+        setLoanStats({ created, approved, rejected });
+      })
+      .catch((err) => {
+        console.error("Failed to fetch loan data:", err);
+      });
+  }, []);
+
   const turnoverData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
     datasets: [
@@ -95,21 +123,21 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-xl shadow p-4 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">📦 Loans Created</p>
-            <p className="text-xl font-bold">124</p>
+            <p className="text-xl font-bold">{loanStats.created}</p>
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow p-4 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">✅ Loans Approved</p>
-            <p className="text-xl font-bold">86</p>
+            <p className="text-xl font-bold">{loanStats.approved}</p>
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow p-4 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">❌ Loans Rejected</p>
-            <p className="text-xl font-bold">21</p>
+            <p className="text-xl font-bold">{loanStats.rejected}</p>
           </div>
         </div>
 

@@ -15,7 +15,6 @@ const style = {
 }
 
 const navLinks = [
-  { label: '🏠 Dashboard', path: '/dashboard', key: ['home'] },
   { label: '📄 My Loans', path: '/dashboard/loan', key: ['loans', 'loanDetails'] },
   { label: '💳 Payments', path: '#', key: ['payments'] },
   { label: '🔔 Notifications', path: '#', key: ['notifications'] },

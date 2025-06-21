@@ -76,6 +76,7 @@ const Loginpage = ({ user }) => {
       setMessage('A password reset link has been sent to your email.');
       setError('');
     } catch (error) {
+      alert("Error occurred");
       setError('An error occurred, please try again.');
       setMessage('');
     }
@@ -110,6 +111,7 @@ const Loginpage = ({ user }) => {
       saveUser(response.data);
       navigate('/');
     } catch (error) {
+      alert("Error occurred during registering");
       console.error('Registration error:', error.response?.data || error.message);
     }
   };
