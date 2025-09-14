@@ -1,6 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Search, X, Filter, Database, Leaf, Droplets, TreePine, Shield, Recycle, Wind } from 'lucide-react';
 import axios from 'axios';
+import API from '../hooks/API';
+
+const useApi = API();
 
 // Type definitions matching your database schema
 interface SustainabilityRule {
@@ -22,147 +25,6 @@ interface SustainabilityRule {
   footnotes: string;
 }
 
-// Sample data with your exact structure
-// const sampleData: Record<string, SustainabilityRule[]> = {
-//   CLIMATE_MITIGATION: [
-//     {
-//       id: 1,
-//       type: "CLIMATE_MITIGATION",
-//       nace: "A.01.11",
-//       sector: "Agriculture, forestry and fishing",
-//       activityNumber: "1.1",
-//       activity: "Forest management activities that contribute to climate change mitigation through sustainable forest practices, carbon sequestration, and biodiversity conservation",
-//       contributionType: "Substantial Contribution",
-//       description: "This activity involves the implementation of sustainable forest management practices that enhance carbon storage, promote biodiversity, and contribute to climate change mitigation efforts through responsible forestry operations.",
-//       substantialContributionCriteria: "The activity contributes substantially to climate change mitigation by implementing forest management practices that result in net removals of greenhouse gases from the atmosphere and enhance long-term carbon storage in forest ecosystems.",
-//       climateMitigationDNSH: "Not applicable - this is the environmental objective to which the activity contributes substantially.",
-//       circularEconomyDNSH: "The activity does not lead to significant inefficiencies in the use of materials or in the direct or indirect use of natural resources throughout the life cycle.",
-//       climateAdaptationDNSH: "The activity does not lead to an increased adverse impact of the current climate and the expected future climate on the activity itself or on people, nature or assets.",
-//       waterDNSH: "The activity does not lead to significant harm to the good status or good ecological potential of bodies of water including surface water and groundwater.",
-//       pollutionPreventionDNSH: "The activity does not lead to significant increases in the emissions of pollutants into air, water or land.",
-//       biodiversityDNSH: "The activity does not lead to significant harm to the good condition and resilience of ecosystems or to the conservation status of habitats and species.",
-//       footnotes: "This activity requires compliance with relevant EU and national legislation on forest management and environmental protection."
-//     },
-//     {
-//       id: 2,
-//       type: "CLIMATE_MITIGATION",
-//       nace: "D.35.11",
-//       sector: "Electricity, gas, steam and air conditioning supply",
-//       activityNumber: "4.1",
-//       activity: "Electricity generation using solar photovoltaic technology",
-//       contributionType: "Substantial Contribution",
-//       description: "Generation of electricity using solar photovoltaic panels that convert sunlight directly into electricity without greenhouse gas emissions during operation.",
-//       substantialContributionCriteria: "The activity generates electricity with life cycle GHG emissions lower than 100g CO2e/kWh.",
-//       climateMitigationDNSH: "Not applicable - this is the environmental objective to which the activity contributes substantially.",
-//       circularEconomyDNSH: "The activity implements measures for waste prevention and management during construction and operation phases.",
-//       climateAdaptationDNSH: "Physical climate risks have been identified and addressed through appropriate adaptation solutions.",
-//       waterDNSH: "Water use is optimized and does not compromise water resources in water-stressed areas.",
-//       pollutionPreventionDNSH: "Emissions to air, water and land are prevented or minimized through best available techniques.",
-//       biodiversityDNSH: "Environmental impact assessments have been conducted and mitigation measures implemented.",
-//       footnotes: "Compliance with relevant technical standards and environmental regulations is required."
-//     }
-//   ],
-//   CIRCULAR_ECONOMY: [
-//     {
-//       id: 3,
-//       type: "CIRCULAR_ECONOMY",
-//       nace: "E.38.32",
-//       sector: "Water supply; sewerage, waste management and remediation activities",
-//       activityNumber: "5.9",
-//       activity: "Material recovery from non-hazardous waste",
-//       contributionType: "Substantial Contribution",
-//       description: "Recovery of materials from non-hazardous waste through sorting, cleaning, and processing to produce secondary raw materials.",
-//       substantialContributionCriteria: "The activity recovers materials that substitute virgin materials in production processes, contributing to circular economy principles.",
-//       climateMitigationDNSH: "The activity does not lead to significant greenhouse gas emissions compared to alternative waste treatment options.",
-//       circularEconomyDNSH: "Not applicable - this is the environmental objective to which the activity contributes substantially.",
-//       climateAdaptationDNSH: "Climate risks have been assessed and appropriate adaptation measures implemented.",
-//       waterDNSH: "Water consumption and discharge are managed to prevent harm to water bodies.",
-//       pollutionPreventionDNSH: "Best available techniques are used to prevent pollution during material recovery processes.",
-//       biodiversityDNSH: "Operations do not significantly harm local ecosystems and biodiversity.",
-//       footnotes: "Activity must comply with waste management regulations and quality standards for recovered materials."
-//     }
-//   ],
-//   WATER: [
-//     {
-//       id: 4,
-//       type: "WATER",
-//       nace: "E.36.00",
-//       sector: "Water collection, treatment and supply",
-//       activityNumber: "6.1",
-//       activity: "Water collection, treatment and supply systems",
-//       contributionType: "Substantial Contribution",
-//       description: "Collection, treatment and supply of water for human consumption and other uses, including infrastructure for water distribution.",
-//       substantialContributionCriteria: "The activity contributes to the sustainable use and protection of water resources through efficient collection, treatment and distribution systems.",
-//       climateMitigationDNSH: "Energy efficiency measures are implemented to minimize greenhouse gas emissions from operations.",
-//       circularEconomyDNSH: "Water reuse and recycling opportunities are maximized where technically feasible.",
-//       climateAdaptationDNSH: "Infrastructure is designed to be resilient to climate change impacts including extreme weather events.",
-//       waterDNSH: "Not applicable - this is the environmental objective to which the activity contributes substantially.",
-//       pollutionPreventionDNSH: "Treatment processes prevent pollution of water bodies and comply with discharge standards.",
-//       biodiversityDNSH: "Water abstraction does not compromise the ecological status of water bodies and associated ecosystems.",
-//       footnotes: "Compliance with drinking water quality standards and environmental permits is mandatory."
-//     }
-//   ],
-//   BIODIVERSITY: [
-//     {
-//       id: 5,
-//       type: "BIODIVERSITY",
-//       nace: "A.02.40",
-//       sector: "Agriculture, forestry and fishing",
-//       activityNumber: "1.3",
-//       activity: "Conservation forestry",
-//       contributionType: "Substantial Contribution",
-//       description: "Forest management activities focused on biodiversity conservation, habitat protection, and ecosystem restoration.",
-//       substantialContributionCriteria: "The activity contributes substantially to biodiversity conservation through habitat protection, species conservation, and ecosystem restoration measures.",
-//       climateMitigationDNSH: "Forest management practices maintain or enhance carbon storage capacity.",
-//       circularEconomyDNSH: "Sustainable use of forest resources without compromising ecosystem integrity.",
-//       climateAdaptationDNSH: "Forest management enhances ecosystem resilience to climate change impacts.",
-//       waterDNSH: "Activities protect watershed functions and water quality.",
-//       pollutionPreventionDNSH: "Management practices prevent soil, water, and air pollution.",
-//       biodiversityDNSH: "Not applicable - this is the environmental objective to which the activity contributes substantially.",
-//       footnotes: "Activities must be conducted in accordance with biodiversity conservation plans and relevant legislation."
-//     }
-//   ],
-//   POLLUTION_PREVENTION: [
-//     {
-//       id: 6,
-//       type: "POLLUTION_PREVENTION",
-//       nace: "E.39.00",
-//       sector: "Remediation activities and other waste management services",
-//       activityNumber: "7.4",
-//       activity: "Remediation of contaminated sites and areas",
-//       contributionType: "Substantial Contribution",
-//       description: "Activities aimed at removing, controlling or reducing contamination in soil, groundwater, or surface water to prevent pollution and protect human health and the environment.",
-//       substantialContributionCriteria: "The activity contributes substantially to pollution prevention and control by removing or reducing existing contamination and preventing further pollution spread.",
-//       climateMitigationDNSH: "Remediation techniques minimize greenhouse gas emissions and energy consumption.",
-//       circularEconomyDNSH: "Remediation processes maximize resource recovery and minimize waste generation.",
-//       climateAdaptationDNSH: "Remediation solutions are resilient to climate change impacts.",
-//       waterDNSH: "Remediation protects and improves water quality without causing harm to water bodies.",
-//       pollutionPreventionDNSH: "Not applicable - this is the environmental objective to which the activity contributes substantially.",
-//       biodiversityDNSH: "Remediation activities restore ecosystem functions and do not harm biodiversity.",
-//       footnotes: "Remediation must meet applicable environmental standards and regulatory requirements."
-//     }
-//   ],
-//   CLIMATE_ADAPTATION: [
-//     {
-//       id: 7,
-//       type: "CLIMATE_ADAPTATION",
-//       nace: "F.42.91",
-//       sector: "Construction",
-//       activityNumber: "8.2",
-//       activity: "Construction of flood defences",
-//       contributionType: "Substantial Contribution",
-//       description: "Construction of infrastructure designed to protect against flooding and other climate-related risks, including sea walls, flood barriers, and drainage systems.",
-//       substantialContributionCriteria: "The activity contributes substantially to climate change adaptation by reducing climate risks for human activities, people, nature or assets.",
-//       climateMitigationDNSH: "Construction materials and processes minimize greenhouse gas emissions through sustainable practices.",
-//       circularEconomyDNSH: "Construction incorporates circular economy principles including material reuse and recycling.",
-//       climateAdaptationDNSH: "Not applicable - this is the environmental objective to which the activity contributes substantially.",
-//       waterDNSH: "Flood defence systems are designed to work with natural water systems without causing harm.",
-//       pollutionPreventionDNSH: "Construction activities prevent pollution of soil, water, and air through best practices.",
-//       biodiversityDNSH: "Infrastructure design incorporates measures to minimize impacts on local ecosystems and species.",
-//       footnotes: "Construction must comply with building codes, environmental regulations, and climate resilience standards."
-//     }
-//   ]
-// };
 
 const typeIcons = {
   CLIMATE_MITIGATION: Wind,
@@ -199,7 +61,7 @@ function Rule() {
 
   // Fetch rules
   const fetchRule = async () => {
-    const resRule = await axios.get('http://localhost:8080/api/rules');
+    const resRule = await axios.get(useApi.url+'/rules');
     setRule(resRule.data);
     console.log(resRule.data);
   };

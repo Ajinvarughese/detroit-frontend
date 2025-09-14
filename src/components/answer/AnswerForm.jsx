@@ -19,9 +19,10 @@ import { getUser } from '../hooks/LocalStorageUser';
 import { toCamelCase } from '../hooks/EnumToString';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import API from '../hooks/API';
 
 const { Option } = Select;
-
+const useApi = API();
 const AnswerForm = ({ preview = false }) => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const AnswerForm = ({ preview = false }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/questionnaire/u/form/${id}`);
+        const response = await axios.get(`${useApi.url}/questionnaire/u/form/${id}`);
         setQuestionnaire(response.data);
         const fetchedQuestions = response.data.questions.map((q) => ({
           id: q.id,

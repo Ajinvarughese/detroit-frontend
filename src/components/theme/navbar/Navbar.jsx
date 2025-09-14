@@ -27,6 +27,10 @@ const Navbar = ({style = {position: "fixed"}, isDark = false }) => {
         name: 'Dashboard',
         link: '/dashboard/loan'
       },
+      {
+        name: 'Rules',
+        link: '/rules'
+      }
     ],
     bank: [
       {

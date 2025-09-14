@@ -16,8 +16,6 @@ const style = {
 
 const navLinks = [
   { label: '📄 My Loans', path: '/dashboard/loan', key: ['loans', 'loanDetails'] },
-  { label: '💳 Payments', path: '#', key: ['payments'] },
-  { label: '🔔 Notifications', path: '#', key: ['notifications'] },
   { label: '💬 Feedback', path: '/dashboard/feedback', key: ['feedback'] }
 ];
 const Sidebar = ({ page }) => {

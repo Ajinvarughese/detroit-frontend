@@ -13,59 +13,84 @@ import {
 import { Line } from 'react-chartjs-2';
 import AdminSidebar from './AdminSidebar';
 import axios from 'axios';
+import API from '../../hooks/API';
+import dayjs from 'dayjs';
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend, Filler);
 
-
+const useApi = API();
+const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 const AdminDashboard = () => {
-
-
   const [loanStats, setLoanStats] = useState({
     created: 0,
     approved: 0,
     rejected: 0,
   });
 
-  useEffect(() => {
-    axios.get("http://localhost:8080/api/loan")
-      .then((res) => {
-        const data = res.data;
+  const [turnoverData, setTurnoverData] = useState(null);
 
+  const [feedback, setFeedback] = useState([
+    { id: 1, name: 'John Doe', message: 'Application stuck at verification', reply: '' },
+    { id: 2, name: 'Jane Smith', message: 'Unable to upload documents', reply: '' },
+  ]);
+  const [currentReply, setCurrentReply] = useState({});
+
+  useEffect(() => {
+    const fetchLoans = async () => {
+      try {
+        const res = await axios.get(useApi.url + "/loan");
+        const loans = res.data;
+
+        // ---- Stats ----
         const rejectedStatuses = ["REJECTED", "CLOSED"];
         const approvedStatuses = ["APPROVED", "DISBURSED", "REPAID"];
-
-        const rejected = data.filter((loan) => rejectedStatuses.includes(loan.status)).length;
-        const approved = data.filter((loan) => approvedStatuses.includes(loan.status)).length;
-        const created = data.length;
-
+        const rejected = loans.filter(l => rejectedStatuses.includes(l.status)).length;
+        const approved = loans.filter(l => approvedStatuses.includes(l.status)).length;
+        const created = loans.length;
         setLoanStats({ created, approved, rejected });
-      })
-      .catch((err) => {
-        console.error("Failed to fetch loan data:", err);
-      });
-  }, []);
 
-  const turnoverData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-    datasets: [
-      {
-        label: 'Total Turnover ($)',
-        data: [12000, 15000, 18000, 17000, 20000],
-        fill: true,
-        backgroundColor: (context) => {
-          const ctx = context.chart.ctx;
-          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
-          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
-          return gradient;
-        },
-        borderColor: '#3b82f6',
-        tension: 0.4,
-        pointBackgroundColor: '#3b82f6',
-      },
-    ],
-  };
+        // ---- Graph data ----
+        const counts = Array(12).fill(0);
+        loans.forEach(loan => {
+          if (loan.createdAt) {
+            const month = dayjs(loan.createdAt).month(); // 0-11
+            counts[month] += 1;
+          }
+        });
+
+        const currentMonth = new Date().getMonth();
+        const maskedData = counts.map((val, i) => (i <= currentMonth ? val : null));
+
+        setTurnoverData({
+          labels: monthNames,
+          datasets: [
+            {
+              label: "Loan Applications",
+              data: maskedData,
+              fill: true,
+              backgroundColor: (context) => {
+                const ctx = context.chart.ctx;
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
+                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
+                return gradient;
+              },
+              borderColor: '#3b82f6',
+              tension: 0.4,
+              pointBackgroundColor: '#3b82f6',
+              spanGaps: false,
+            },
+          ],
+        });
+
+      } catch (err) {
+        console.error("Failed to fetch loans:", err);
+      }
+    };
+
+    fetchLoans();
+  }, []);
 
   const turnoverOptions = {
     responsive: true,
@@ -78,32 +103,18 @@ const AdminDashboard = () => {
       },
     },
     scales: {
-      x: {
-        grid: { display: false },
-        ticks: { color: '#4b5563' },
-      },
-      y: {
-        grid: { color: '#e5e7eb' },
-        ticks: { color: '#4b5563' },
-      },
+      x: { grid: { display: false }, ticks: { color: '#4b5563' } },
+      y: { grid: { color: '#e5e7eb' }, ticks: { color: '#4b5563' } },
     },
   };
-
-  const [feedback, setFeedback] = useState([
-    { id: 1, name: 'John Doe', message: 'Application stuck at verification', reply: '' },
-    { id: 2, name: 'Jane Smith', message: 'Unable to upload documents', reply: '' },
-  ]);
-  const [currentReply, setCurrentReply] = useState({});
 
   const handleReplyChange = (id, value) => {
     setCurrentReply({ ...currentReply, [id]: value });
   };
 
   const handleReplySubmit = (id) => {
-    setFeedback((prev) =>
-      prev.map((fb) =>
-        fb.id === id ? { ...fb, reply: currentReply[id] || fb.reply } : fb
-      )
+    setFeedback(prev =>
+      prev.map(fb => fb.id === id ? { ...fb, reply: currentReply[id] || fb.reply } : fb)
     );
     setCurrentReply({ ...currentReply, [id]: '' });
   };
@@ -116,7 +127,7 @@ const AdminDashboard = () => {
         {/* Header */}
         <div className="col-span-3">
           <h1 className="text-3xl font-bold text-blue-800">Admin Dashboard</h1>
-          <p className="text-gray-600 mb-4">Turnover insights and feedback panel</p>
+          <p className="text-gray-600 mb-4">Loan application trends and feedback panel</p>
         </div>
 
         {/* Stat Cards */}
@@ -141,44 +152,10 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Turnover Graph */}
+        {/* Loan Applications Graph */}
         <div className="col-span-2 bg-white rounded-xl shadow p-6">
-          <h2 className="text-xl font-semibold text-blue-700 mb-4">Turnover Overview</h2>
-          <Line data={turnoverData} options={turnoverOptions} />
-        </div>
-
-        {/* Feedback Panel */}
-        <div className="col-span-1">
-          <div className="bg-white p-4 rounded-xl shadow h-full flex flex-col">
-            <h2 className="text-lg font-semibold text-blue-700 mb-4">User Feedback</h2>
-            <div className="overflow-y-auto space-y-4 flex-1 pr-2">
-              {feedback.map((fb) => (
-                <div key={fb.id} className="bg-blue-50 p-3 rounded border border-blue-100">
-                  <p className="font-semibold text-blue-800">{fb.name}</p>
-                  <p className="text-gray-700 mt-1">🗨️ {fb.message}</p>
-                  {fb.reply ? (
-                    <p className="text-green-700 mt-2 italic">🧑‍💻 Reply: {fb.reply}</p>
-                  ) : (
-                    <div className="mt-2">
-                      <textarea
-                        value={currentReply[fb.id] || ''}
-                        onChange={(e) => handleReplyChange(fb.id, e.target.value)}
-                        placeholder="Type your reply..."
-                        className="w-full p-2 border rounded mb-2 text-sm"
-                        rows={2}
-                      />
-                      <button
-                        onClick={() => handleReplySubmit(fb.id)}
-                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
-                      >
-                        Send Reply
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+          <h2 className="text-xl font-semibold text-blue-700 mb-4">Loan Applications Overview</h2>
+          {turnoverData && <Line data={turnoverData} options={turnoverOptions} />}
         </div>
       </main>
     </div>

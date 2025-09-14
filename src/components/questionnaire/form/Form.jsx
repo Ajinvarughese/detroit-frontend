@@ -15,7 +15,9 @@ import {
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import API from "../../hooks/API";
 
+const useApi = API();
 const QUESTION_TYPES = {
     Text: "TEXT",
     Radio: "RADIO",
@@ -45,7 +47,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
 
     const fetchRules = async () => {
         try {
-            const res = await axios.get(`http://localhost:8080/api/rules/${loanCategory}`);
+            const res = await axios.get(`${useApi.url}/rules/${loanCategory}`);
             setRules(res.data);
         } catch (error) {
             console.error("Error fetching rules:", error);
@@ -60,7 +62,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
         if (!questionData?.id || options.length > 0) return;
 
         try {
-            const res = await axios.get(`http://localhost:8080/api/choices/question/${questionData.id}`);
+            const res = await axios.get(`${useApi.url}/choices/question/${questionData.id}`);
             let fetchedOptions = res.data.map(choice => ({
                 id: choice.id,
                 choiceText: choice.choiceText,
@@ -74,7 +76,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
                     score: 0
                 };
 
-                const created = await axios.post("http://localhost:8080/api/choices", payload, {
+                const created = await axios.post(useApi.url+"/choices", payload, {
                     headers: { "Content-Type": "application/json" },
                 });
 
@@ -107,7 +109,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
                 questionType: questionType,
             };
 
-            await axios.put("http://localhost:8080/api/question", questionPayload, {
+            await axios.put(useApi.url+"/question", questionPayload, {
                 headers: { "Content-Type": "application/json" },
             });
 
@@ -120,7 +122,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
                     id: choice.id
                 };
 
-                await axios.put("http://localhost:8080/api/choices", payload, {
+                await axios.put(useApi.url+"/choices", payload, {
                     headers: { "Content-Type": "application/json" },
                 });
             }));
@@ -153,7 +155,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
                 choiceText: `Option ${options.length + 1}`,
                 score: 0
             };
-            const res = await axios.post("http://localhost:8080/api/choices", payload, {
+            const res = await axios.post(useApi.url+"/choices", payload, {
                 headers: { "Content-Type": "application/json" },
             });
             setOptions([...options, { id: res.data.id, choiceText: res.data.choiceText, score: res.data.score }]);
@@ -165,7 +167,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
     const removeOption = async (index) => {
         const toRemove = options[index];
         try {
-            await axios.delete(`http://localhost:8080/api/choices/${toRemove.id}`);
+            await axios.delete(`${useApi.url}/choices/${toRemove.id}`);
             setOptions(options.filter((_, i) => i !== index));
         } catch (error) {
             console.error("Failed to delete choice:", error);
@@ -225,7 +227,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
 
         try {
             setIsLoadingDefault(true); // loading on
-            await Promise.all(options.map(opt => axios.delete(`http://localhost:8080/api/choices/${opt.id}`)));
+            await Promise.all(options.map(opt => axios.delete(`${useApi.url}/choices/${opt.id}`)));
             setOptions([]);
 
             if (val === 'sector') {
@@ -239,7 +241,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
                         choiceText: sector,
                         score: 0
                     };
-                    const res = await axios.post("http://localhost:8080/api/choices", payload);
+                    const res = await axios.post(useApi.url+"/choices", payload);
                     return { id: res.data.id, choiceText: res.data.choiceText, score: res.data.score };
                 }));
             } else if (val === 'activity') {
@@ -253,7 +255,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
                         choiceText: activity,
                         score: 0
                     };
-                    const res = await axios.post("http://localhost:8080/api/choices", payload);
+                    const res = await axios.post(useApi.url+"/choices", payload);
                     return { id: res.data.id, choiceText: res.data.choiceText, score: res.data.score };
                 }));
             }

@@ -6,7 +6,9 @@ import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router";
 import { convertToEnum } from '../hooks/EnumToString';
+import API from '../hooks/API';
 
+const useApi = API();
 const templates = [
     { title: "Blank Form", color: "#f0f0f0", icon: "📄" },
     { title: "Water", color: "#c8e6c9", icon: "🌊" },
@@ -32,7 +34,7 @@ function Questionnaire() {
     const [creating, setCreating] = useState(false); // NEW
 
     const formResponse = async () => {
-        const response = await axios.get("http://localhost:8080/api/questionnaire");
+        const response = await axios.get(useApi.url+"/questionnaire");
         setForms(response.data.reverse());
     };
 
@@ -50,7 +52,7 @@ function Questionnaire() {
             loanCategory
         };
         try {
-            const response = await axios.post("http://localhost:8080/api/questionnaire", questionnaireParms, {
+            const response = await axios.post(useApi.url+"/questionnaire", questionnaireParms, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -63,7 +65,7 @@ function Questionnaire() {
                 questionType: "CHECKBOX",
                 questionUUID: uuidv4(),
             }
-            await axios.post("http://localhost:8080/api/question", questionParms, {
+            await axios.post(useApi.url+"/question", questionParms, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -80,7 +82,7 @@ function Questionnaire() {
 
         setTimeout(async () => {
             try {
-                await axios.delete(`http://localhost:8080/api/questionnaire/${form.id}`);
+                await axios.delete(`${useApi.url}/questionnaire/${form.id}`);
                 setForms(prev => prev.filter(f => f.id !== form.id));
                 setDeletingForms(prev => prev.filter(id => id !== form.id));
             } catch (error) {

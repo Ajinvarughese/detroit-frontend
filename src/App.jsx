@@ -13,6 +13,7 @@ import LoanApplicationForm from './components/loan/loanApplication/LoanApplicati
 import AdminDashboard from './components/dashboard/admin/AdminDashboard.jsx';
 import RuleEditor from './components/dashboard/admin/RuleEditor.jsx'
 import Rule from './components/rule/Rule';
+import Feedback from './components/dashboard/admin/Feedback';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
       <Routes>
         <Route path='/admin' element={<AdminDashboard />} />
         <Route path='/admin/rules' element={<RuleEditor />} />
+        <Route path='/admin/feedbacks' element={<Feedback />} />
       </Routes>
     }
     {
@@ -48,6 +50,7 @@ function App() {
         <Route path='/dashboard/feedback' element={ <Applicant page="feedback" /> } />
         <Route path='/questionnaire/form/:id' element={<AnswerForm />} />
         <Route path='/loan/application/:loanType/:loanUUID' element={<LoanApplicationForm />} />
+        <Route path='/rules' element={<Rule />} />
       </Routes>
 
     }

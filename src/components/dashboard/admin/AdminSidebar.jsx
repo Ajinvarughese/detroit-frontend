@@ -1,6 +1,6 @@
 import { Cog8ToothIcon, HomeIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
 import { Link, useLocation, useNavigate } from "react-router";
-import { deleteUser } from "../../hooks/LocalStorageUser";
+import { Feedback } from "@mui/icons-material";
 
 const AdminSidebar = () => {
   const location = useLocation();
@@ -22,12 +22,9 @@ const AdminSidebar = () => {
           <PencilSquareIcon className="h-5 w-5" />
           Rule Editor
         </Link>
-        <Link className={linkClass('/admin/settings')} onClick={() => {
-          deleteUser();
-          navigate("/")
-        }}>
-          <Cog8ToothIcon className="h-5 w-5" />
-          Settings
+        <Link to="/admin/feedbacks" className={linkClass('/admin/feedbacks')}>
+          <Feedback className="h-5 w-5" />
+          Feedbacks
         </Link>
       </nav>
     </aside>

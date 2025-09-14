@@ -10,8 +10,9 @@ import { Send } from "lucide-react";
 import { motion } from 'framer-motion';
 import { amountFormat } from "../../../hooks/Formatter";
 import { convertToString, toCamelCase } from "../../../hooks/EnumToString";
+import API from "../../../hooks/API";
 
-
+const useApi = API();
 const AllLoans = () => {
   const navigate = useNavigate();
   const [loan, setLoan] = useState([]);
@@ -19,7 +20,7 @@ const AllLoans = () => {
   useEffect(() => {
     const fetchAllLoans = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/loan/user/${getUser("user").id}`);
+        const res = await axios.get(`${useApi.url}/loan/user/${getUser("user").id}`);
         setLoan(res.data.reverse());    
       } catch (err) {
         console.error('Error fetching loan:', err);
@@ -66,7 +67,7 @@ const LoanUpdation = () => {
 
   const fetchLoan = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/loan/${id}`);
+        const res = await axios.get(`${useApi.url}/loan/${id}`);
         setLoan(res.data);
         setStatus(res.data.status);
       } catch (err) {
@@ -80,10 +81,11 @@ const LoanUpdation = () => {
   const handleApproved = async () => {
     console.log(loan);
     try {
-      const approvedRes = await axios.put("http://localhost:8080/api/loan/updateRequest", loan, {
+      const approvedRes = await axios.put(useApi.url+"/loan/updateRequest", loan, {
        headers: { 'Content-Type' : 'application/json' }
       })
       console.log(approvedRes);
+      fetchLoan();
       
     } catch (error) {
       console.error(error);
@@ -95,7 +97,7 @@ const LoanUpdation = () => {
       id: loan.id,
       status: "CLOSED"
     }
-    const res = await axios.put(`http://localhost:8080/api/loan/status`,data, {
+    const res = await axios.put(`${useApi.url}/loan/status`,data, {
       headers: { 'Content-Type': 'application/json'}
     });
     fetchLoan();
@@ -112,7 +114,7 @@ const LoanUpdation = () => {
       loan.amount = newAmount === null ? loan.amount : amountFormat(newAmount, false);
       loan.durationMonths = duration === null ? loan.durationMonths : Number(duration);
       
-      const res = await axios.put(`http://localhost:8080/api/loan/newRequest`, loan, {
+      const res = await axios.put(`${useApi.url}/loan/newRequest`, loan, {
         headers: { 'Content-Type': 'application/json' }
       });
 
@@ -225,13 +227,17 @@ const LoanSummary = () => {
       const fetchLoan = async () => {
       try {
           const res = await axios.get(`http://localhost:8080/api/loan/${id}`);
-          console.log(res.data);
           setLoan(res.data);
-          setPayments(res.data.payments || []);
       } catch (err) {
           console.error('Error fetching loan:', err);
       }
       };
+
+      const fetchPayment = async () => {
+        const res = await axios.get(`http://localhost:8080/api/loan/payment/${id}`);
+        setPayments(res.data.reverse());
+      }
+      fetchPayment();
       fetchLoan();
   }, []);
 
@@ -273,7 +279,7 @@ const LoanSummary = () => {
       </div>
 
       {/* Payment History */}
-      <div className="applicant-card applicant-payment-history">
+      <div className="applicant-card applicant-payment-history" style={{ maxHeight: "300px", overflowY: "auto" }}>
         <h3>Payment History</h3>
         <table>
           <thead>
@@ -286,28 +292,24 @@ const LoanSummary = () => {
           <tbody>
             {payments.map((p, i) => (
               <tr key={i}>
-                <td>{p.date?.split('T')[0]}</td>
-                <td>₹{p.amount}</td>
-                <td className={p.status === 'PAID' ? 'applicant-status-paid' : 'applicant-status-due'}>
-                  {p.status}
+                <td>{formattedDate(p.createdAt)}</td>
+                <td>₹{p.amountPaid.toFixed(2)}</td>
+                <td className="applicant-status-paid">
+                  PAID
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <style>
+      {`
+        .applicant-payment-history::-webkit-scrollbar {
+          display: none;
+        }
+      `}
+    </style>
 
-      {/* Notifications */}
-      <div className="applicant-card applicant-notifications">
-        <h3>Notifications</h3>
-        <ul>
-          {!loan?.documentVerified && <li>📌 Please verify your documents.</li>}
-          {loan?.amount_Pending > 0 && <li>⚠️ EMI is due. Make a payment soon.</li>}
-          {loan?.isEligible === false && (
-            <li>❗ Not eligible: {loan?.eligibilityReason || 'Reason not provided'}</li>
-          )}
-        </ul>
-      </div>
 
       {/* Support Section */}
       <div className="applicant-card">

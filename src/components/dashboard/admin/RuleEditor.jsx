@@ -2,7 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AdminSidebar from './AdminSidebar';
+import API from '../../hooks/API';
 
+const useApi = API();
 const RuleEditor = () => {
   const [rules, setRules] = useState([]);
   const [editingRuleId, setEditingRuleId] = useState(null);
@@ -10,7 +12,7 @@ const RuleEditor = () => {
 
   const fetchRules = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/rules');
+      const res = await axios.get(useApi.url+'/rules');
       setRules(res.data);
     } catch (error) {
       console.error(error);
@@ -32,7 +34,7 @@ const RuleEditor = () => {
 
   const handleSave = async () => {
     try {
-      const res = await axios.put(`http://localhost:8080/api/rules`, editedData, {
+      const res = await axios.put(`${useApi.url}/rules`, editedData, {
         headers: {
           'Content-Type': 'application/json'
         }

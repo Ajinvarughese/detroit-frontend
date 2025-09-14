@@ -4,7 +4,9 @@ import { formattedDate, monthsToYears } from '../../../hooks/CurrentDate';
 import { Button, TextField, Typography, Chip } from '@mui/material';
 import { ArrowDropDown, ArrowDropUp, PictureAsPdf, Remove } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
+import API from '../../../hooks/API';
 
+const useApi = API();
 const actionableStatus = ["REQUESTED", "PENDING"];
 const hiddenStatuses = ["CREATED", "CLOSED"];
 
@@ -25,7 +27,7 @@ const LoansTable = () => {
   useEffect(() => {
     const fetchAllLoans = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/api/loan");
+        const res = await axios.get(useApi.url+"/loan");
         const priority = {
           CREATED: 0,
           CLOSED: 1,
@@ -64,7 +66,7 @@ const LoansTable = () => {
     }
     try {
       loan.status = decision;
-      const res = await axios.put("http://localhost:8080/api/loan/updateRequest", loan);
+      const res = await axios.put(useApi.url+"/loan/updateRequest", loan);
       setLoans(prev =>
         prev.map(l => l.id === id ? { ...l, status: res.data.status } : l)
       );

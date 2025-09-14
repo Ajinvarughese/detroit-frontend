@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Send, Paperclip, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import { getUser } from "../../../hooks/LocalStorageUser";
+import API from '../../../hooks/API';
 
+const useApi = API();
 const Feedback = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -27,7 +29,7 @@ const Feedback = () => {
         const fileData = new FormData();
         fileData.append("document", attachment);
 
-        const uploadRes = await axios.post("http://localhost:8080/api/feedback/file/upload", fileData, {
+        const uploadRes = await axios.post(useApi.url+"/feedback/file/upload", fileData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -47,7 +49,7 @@ const Feedback = () => {
       };
 
       // 3. Submit feedback
-      await axios.post("http://localhost:8080/api/feedback", feedbackData, {
+      await axios.post(useApi.url+"/feedback", feedbackData, {
         headers: { 'Content-Type': 'application/json' },
       });
 

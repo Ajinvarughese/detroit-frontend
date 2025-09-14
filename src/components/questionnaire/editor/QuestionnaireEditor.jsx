@@ -19,6 +19,9 @@ import { useParams } from "react-router";
 import axios from "axios";
 import { Select } from "antd";
 import { useNavigate } from "react-router";
+import API from "../../hooks/API";
+
+const useApi = API();
 
 const QuestionnaireEditor = () => {
     const navigate = useNavigate();
@@ -38,7 +41,7 @@ const QuestionnaireEditor = () => {
     useEffect(() => {
         const fetchQuestionnaire = async () => {
             try {
-                const res = await axios.get(`http://localhost:8080/api/questionnaire/form/${id}`);
+                const res = await axios.get(`${useApi.url}/questionnaire/form/${id}`);
                 setQuestionnaireData(res.data);
                 setTitle(res.data.title);
                 setDescription(res.data.description);
@@ -56,7 +59,7 @@ const QuestionnaireEditor = () => {
         if (!questionnaireData?.id) return;
         const fetchQuestions = async () => {
             try {
-                const res = await axios.get(`http://localhost:8080/api/question/questionnaire/${questionnaireData?.id}`);
+                const res = await axios.get(`${useApi.url}/question/questionnaire/${questionnaireData?.id}`);
                 setQuestions(res.data);
             } catch (error) {
                 console.error("Error fetching questions:", error);
@@ -77,7 +80,7 @@ const QuestionnaireEditor = () => {
     useEffect(() => {
         const fetchLoanCategories = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/api/loan/categories");
+                const res = await axios.get(useApi.url+"/loan/categories");
                 setLoanCategoryOptions(res.data);
             } catch (error) {
                 console.error("Failed to fetch loan categories:", error);
@@ -97,7 +100,7 @@ const QuestionnaireEditor = () => {
             questionnaireType, // Include new field
         };
         try {
-            await axios.put(`http://localhost:8080/api/questionnaire`, updated);
+            await axios.put(`${useApi.url}/questionnaire`, updated);
         } catch (error) {
             console.error("Failed to save questionnaire:", error);
         } finally {
@@ -120,7 +123,7 @@ const QuestionnaireEditor = () => {
             questionUUID: uuidv4(),
         };
         try {
-            const res = await axios.post(`http://localhost:8080/api/question`, newQ, {
+            const res = await axios.post(`${useApi.url}/question`, newQ, {
                 headers: { "Content-Type": "application/json" },
             });
             setQuestions((prev) => [...prev, res.data]);
@@ -132,7 +135,7 @@ const QuestionnaireEditor = () => {
     // Remove question
     const removeQuestion = async (questionData) => {
         setQuestions((prev) => prev.filter((q) => q.questionUUID !== questionData.questionUUID));
-        await axios.delete(`http://localhost:8080/api/question/${questionData.id}`);
+        await axios.delete(`${useApi.url}/question/${questionData.id}`);
     };
 
     return (

@@ -10,7 +10,9 @@ import { useNavigate, useParams } from 'react-router';
 import { getUser } from '../../hooks/LocalStorageUser';
 import axios from 'axios';
 import { monthsToYears } from '../../hooks/CurrentDate';
+import API from '../../hooks/API';
 
+const useApi = API();
 
 const loanCategory = [
   "POLLUTION_PREVENTION",
@@ -111,7 +113,7 @@ const LoanApplicationForm = () => {
     }
     
     try {
-      const loanRes = await axios.post("http://localhost:8080/api/loan/application/" + loanUUID, parm, {
+      const loanRes = await axios.post(useApi.url+"/loan/application/" + loanUUID, parm, {
         headers: { 'Content-Type': 'application/json' }
       });
       const loan = loanRes.data;
@@ -124,13 +126,13 @@ const LoanApplicationForm = () => {
       const formData = new FormData();
       formData.append("projectReport", form.projectReport);
 
-      const uploadedFile = await axios.post("http://localhost:8080/api/loan/file/upload", formData, {
+      const uploadedFile = await axios.post(useApi.url+"/loan/file/upload", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
       loan.projectReportPath = uploadedFile.data; 
-      const updatedLoan = await axios.put("http://localhost:8080/api/loan", loan, {
+      const updatedLoan = await axios.put(useApi.url+"/loan", loan, {
         headers: {
           'Content-Type': 'application/json'
         }

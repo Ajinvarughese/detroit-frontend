@@ -7,8 +7,10 @@ import { getUser } from '../hooks/LocalStorageUser.jsx';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { CircularProgress } from "@mui/material";
+import API from '../hooks/API.jsx';
 // import { ArrowForward } from "lucide-react";
 
+const useApi = API();
 const LoanPage = ({ type }) => {
     const navigate = useNavigate();
     const data = loanData[type];
@@ -22,7 +24,7 @@ const LoanPage = ({ type }) => {
 
     const getForm = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/questionnaire/loan/${type}`);     
+            const response = await axios.get(`${useApi.url}/questionnaire/loan/${type}`);     
             const questionnaires = response.data;
 
             // Find the questionnaire where questionnaireType is "PRIMARY"

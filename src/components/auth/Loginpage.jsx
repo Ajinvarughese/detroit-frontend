@@ -7,6 +7,9 @@ import {
 } from "react-icons/fa";
 import { saveUser } from '../hooks/LocalStorageUser';
 import { useNavigate } from "react-router";
+import API  from '../hooks/API';
+
+const useApi = API();
 
 const Loginpage = ({ user }) => {
 
@@ -55,7 +58,7 @@ const Loginpage = ({ user }) => {
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/api/user/login', data, {
+      const response = await axios.post(useApi.url+'/user/login', data, {
         headers: { 'Content-Type': 'application/json' }
       });
       console.log('Login success:', response.data);
@@ -72,7 +75,7 @@ const Loginpage = ({ user }) => {
   const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/api/user/forgot-password', { email: forgotEmail });
+      const response = await axios.post(useApi.url+'/user/forgot-password', { email: forgotEmail });
       setMessage('A password reset link has been sent to your email.');
       setError('');
     } catch (error) {
@@ -104,7 +107,7 @@ const Loginpage = ({ user }) => {
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/api/user', data, {
+      const response = await axios.post(useApi.url+'/user', data, {
         headers: { 'Content-Type': 'application/json' }
       });
       console.log('Registration success:', response.data);

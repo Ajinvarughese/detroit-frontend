@@ -1,9 +1,11 @@
 import { createContext, useState, useEffect } from 'react';
 import { getUser, saveUser, deleteUser } from './LocalStorageUser';
 import axios from 'axios';
+import API  from './API';
 
 export const AuthContext = createContext();
 
+const useApi = API();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
@@ -22,7 +24,7 @@ export function AuthProvider({ children }) {
   };
 
   try {
-    const response = await axios.post('http://localhost:8080/api/user/login', data, {
+    const response = await axios.post(useApi.url+'/user/login', data, {
       headers: { 'Content-Type': 'application/json' }
     });
     saveUser(response.data);

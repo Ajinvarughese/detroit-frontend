@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { Loan, DisburseRequest, PaymentRequest, StatusUpdateRequest } from '../types/loan';
+import API from '../../../../hooks/API';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const useApi = API();
+const API_BASE_URL = useApi.url;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
