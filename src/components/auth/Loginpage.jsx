@@ -7,12 +7,11 @@ import {
 } from "react-icons/fa";
 import { saveUser } from '../hooks/LocalStorageUser';
 import { useNavigate } from "react-router";
-import API  from '../hooks/API';
+import API from '../hooks/API';
 
 const useApi = API();
 
 const Loginpage = ({ user }) => {
-
   const navigate = useNavigate();
 
   const [showPass, setShowPass] = useState(false);
@@ -40,6 +39,12 @@ const Loginpage = ({ user }) => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
+  // Validation error state
+  const [formErrors, setFormErrors] = useState({
+    phone: '',
+    password: ''
+  });
+
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData((prev) => ({
@@ -58,32 +63,18 @@ const Loginpage = ({ user }) => {
     };
 
     try {
-      const response = await axios.post(useApi.url+'/user/login', data, {
+      const response = await axios.post(useApi.url + '/user/login', data, {
         headers: { 'Content-Type': 'application/json' }
       });
       console.log('Login success:', response.data);
       saveUser(response.data);
       navigate("/");
     } catch (error) {
-      alert("Error occurred during login");
+      alert("Username or password is incorrect.");
       console.error('Login error:', error.response?.data || error.message);
     }
   };
 
-  const handleForgotEmailChange = (e) => setForgotEmail(e.target.value);
-
-  const handleForgotPasswordSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(useApi.url+'/user/forgot-password', { email: forgotEmail });
-      setMessage('A password reset link has been sent to your email.');
-      setError('');
-    } catch (error) {
-      alert("Error occurred");
-      setError('An error occurred, please try again.');
-      setMessage('');
-    }
-  };
 
   const handleRegisterChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -91,10 +82,33 @@ const Loginpage = ({ user }) => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+
+    // Field-level validation
+    if (name === "phone") {
+      if (!/^\d+$/.test(value)) {
+        setFormErrors((prev) => ({ ...prev, phone: "Phone number must be numeric" }));
+      } else {
+        setFormErrors((prev) => ({ ...prev, phone: "" }));
+      }
+    }
+
+    if (name === "password") {
+      if (value.length < 6) {
+        setFormErrors((prev) => ({ ...prev, password: "Password must be at least 6 characters" }));
+      } else {
+        setFormErrors((prev) => ({ ...prev, password: "" }));
+      }
+    }
   };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if errors exist
+    if (formErrors.phone || formErrors.password) {
+      return; // Block submit if errors
+    }
+
     const data = {
       fullName: `${registerData.firstName} ${registerData.lastName}`,
       phone: registerData.phone,
@@ -107,14 +121,14 @@ const Loginpage = ({ user }) => {
     };
 
     try {
-      const response = await axios.post(useApi.url+'/user', data, {
+      const response = await axios.post(useApi.url + '/user', data, {
         headers: { 'Content-Type': 'application/json' }
       });
       console.log('Registration success:', response.data);
       saveUser(response.data);
-      navigate('/');
+      window.location.href = '/';
     } catch (error) {
-      alert("Error occurred during registering");
+      alert("User already exists");
       console.error('Registration error:', error.response?.data || error.message);
     }
   };
@@ -131,13 +145,16 @@ const Loginpage = ({ user }) => {
 
   return (
     <div className="container-login">
-      <div style={{
-      width: '100%',
-      maxWidth: isRegistration ? '500px' : '400px'
-    }} className="wrapper">
+      <div
+        style={{
+          width: '100%',
+          maxWidth: isRegistration ? '500px' : '400px'
+        }}
+        className="wrapper"
+      >
         {/* Login Form */}
         {!isForgotPassword && !isRegistration && (
-          <div style={{width: "100%"}} className="form-box login">
+          <div style={{ width: "100%" }} className="form-box login">
             <form onSubmit={handleLoginSubmit}>
               <h1>Login</h1>
               <div className="input-box">
@@ -161,7 +178,7 @@ const Loginpage = ({ user }) => {
                   value={loginData.password}
                   onChange={handleLoginChange}
                 />
-                <div className="icon"  onClick={() => setShowPass(!showPass)} style={{ zIndex: 100, cursor: 'pointer' }}>
+                <div className="icon" onClick={() => setShowPass(!showPass)} style={{ zIndex: 100, cursor: 'pointer' }}>
                   {showPass ? <FaEye /> : <FaEyeSlash />}
                 </div>
               </div>
@@ -215,6 +232,7 @@ const Loginpage = ({ user }) => {
                 />
                 <FaPhone className="icon" />
               </div>
+              {formErrors.phone && <p style={{ color: "red", fontSize: "12px" }}>{formErrors.phone}</p>}
 
               <div className="input-box">
                 <input
@@ -241,6 +259,7 @@ const Loginpage = ({ user }) => {
                   {showPass ? <FaEye className="icon" /> : <FaEyeSlash className="icon" />}
                 </div>
               </div>
+              {formErrors.password && <p style={{ color: "red", fontSize: "12px" }}>{formErrors.password}</p>}
 
               {user === "APPLICANT" && (
                 <>

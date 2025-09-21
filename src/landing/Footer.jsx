@@ -8,6 +8,7 @@ export default function Footer() {
     <footer className="footer page-wrapper">
       <div className="footer-wrap page">
         <Row>
+          {console.log(footer)}
           {footer.map((foot, index) => (
             <Col key={index.toString()} md={6} xs={24} className="footer-item-col">
               <div className="footer-item">
@@ -23,7 +24,7 @@ export default function Footer() {
                 </h2>
                 {foot.children.map((child) => (
                   <div key={child.link}>
-                    <a target="_blank" rel="noopener noreferrer" href={child.link}>
+                    <a rel="noopener noreferrer" href={child.link}>
                       {child.title}
                       {child.desc && (
                         <span style={{ color: 'rgba(255, 255, 255, 0.65)' }}>
