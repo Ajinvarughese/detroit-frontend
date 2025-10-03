@@ -1,6 +1,6 @@
 const API = () =>  {
     return {
-        url: "http://localhost:8080/api"
+        url: "https://detroit-3i6w.onrender.com/api"
     }
 }
 export default API;

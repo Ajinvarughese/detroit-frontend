@@ -3,7 +3,7 @@ import {
   Container, Box, Typography, TextField, Select, MenuItem, Button,
   InputLabel, FormControl, Input, Grid, InputAdornment, styled
 } from '@mui/material';
-import { User, CalendarDays, Percent, CloudUploadIcon } from 'lucide-react';
+import { User, CloudUploadIcon } from 'lucide-react';
 import { convertToEnum, convertToString, toTitleCase } from '../../hooks/EnumToString';
 import { PictureAsPdf } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router';
