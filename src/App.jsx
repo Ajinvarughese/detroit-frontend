@@ -14,69 +14,71 @@ import AdminDashboard from './components/dashboard/admin/AdminDashboard.jsx';
 import RuleEditor from './components/dashboard/admin/RuleEditor.jsx'
 import Rule from './components/rule/Rule';
 import Feedback from './components/dashboard/admin/Feedback';
+import UserManagement from './components/dashboard/admin/UserManagement';
 
 function App() {
   return (
     <>
-    <BrowserRouter>
-    {/* user depended routes */}
-    {
-      getUser('user').role === "BANK"  &&
-      <Routes>
-        <Route path='/questionnaire/editor/:id' element={<QuestionnaireEditor />} />
-        <Route path='/questionnaire' element={<Questionnaire />} />
-        <Route path='/dashboard' element={<Bank />} />
-        <Route path='/dashboard/loans' element={<Bank page='loanTable' />} />
-        <Route path='/dashboard/feedback' element={ <Bank page="feedback" /> } />
-        <Route path='/dashboard/payment' element={<Bank page='payment' />} />
-        <Route path='/questionnaire/preview/:id' element={<AnswerForm preview />} />
-        <Route path='/rules' element={<Rule />} />
-      </Routes>
-    }
-    {
-      getUser('user').role === "ADMIN"  &&
-      <Routes>
-        <Route path='/admin' element={<AdminDashboard />} />
-        <Route path='/admin/rules' element={<RuleEditor />} />
-        <Route path='/admin/feedbacks' element={<Feedback />} />
-      </Routes>
-    }
-    {
-      getUser('user').role === "APPLICANT" &&
-      <Routes>
-        <Route path='/dashboard' element={<Applicant />} />
-        <Route path='/dashboard/loan' element={<Applicant page='loan' />}/>
-        <Route path='/dashboard/loan/:id' element={<Applicant page='loanDetails' />} />
-        <Route path='/dashboard/feedback' element={ <Applicant page="feedback" /> } />
-        <Route path='/questionnaire/form/:id' element={<AnswerForm />} />
-        <Route path='/loan/application/:loanType/:loanUUID' element={<LoanApplicationForm />} />
-        <Route path='/rules' element={<Rule />} />
-      </Routes>
+      <BrowserRouter>
+        {/* user depended routes */}
+        {
+          getUser('user').role === "BANK" &&
+          <Routes>
+            <Route path='/questionnaire/editor/:id' element={<QuestionnaireEditor />} />
+            <Route path='/questionnaire' element={<Questionnaire />} />
+            <Route path='/dashboard' element={<Bank />} />
+            <Route path='/dashboard/loans' element={<Bank page='loanTable' />} />
+            <Route path='/dashboard/feedback' element={<Bank page="feedback" />} />
+            <Route path='/dashboard/payment' element={<Bank page='payment' />} />
+            <Route path='/questionnaire/preview/:id' element={<AnswerForm preview />} />
+            <Route path='/rules' element={<Rule />} />
+          </Routes>
+        }
+        {
+          getUser('user').role === "ADMIN" &&
+          <Routes>
+            <Route path='/admin' element={<AdminDashboard />} />
+            <Route path='/admin/users' element={<UserManagement />} />
+            <Route path='/admin/rules' element={<RuleEditor />} />
+            <Route path='/admin/feedbacks' element={<Feedback />} />
+          </Routes>
+        }
+        {
+          getUser('user').role === "APPLICANT" &&
+          <Routes>
+            <Route path='/dashboard' element={<Applicant />} />
+            <Route path='/dashboard/loan' element={<Applicant page='loan' />} />
+            <Route path='/dashboard/loan/:id' element={<Applicant page='loanDetails' />} />
+            <Route path='/dashboard/feedback' element={<Applicant page="feedback" />} />
+            <Route path='/questionnaire/form/:id' element={<AnswerForm />} />
+            <Route path='/loan/application/:loanType/:loanUUID' element={<LoanApplicationForm />} />
+            <Route path='/rules' element={<Rule />} />
+          </Routes>
 
-    }
-      {/* Loan pages */}
-      <Routes>
-        <Route path='/loan/biodiversity' element={<LoanPage type={"BIODIVERSITY"} />} />
-        <Route path='/loan/water' element={<LoanPage type={"WATER"} />} />
-        <Route path='/loan/climateAdaptation' element={<LoanPage type={"CLIMATE_ADAPTATION"} />} />
-        <Route path='/loan/climateMitigation' element={<LoanPage type={"CLIMATE_MITIGATION"} />} />
-        <Route path='/loan/pollutionPrevention' element={<LoanPage type={"POLLUTION_PREVENTION"} />} />
-        <Route path='/loan/circularEconomy' element={<LoanPage type={"CIRCULAR_ECONOMY"} />} />
-      </Routes>
-      
+        }
+        {/* Loan pages */}
+        <Routes>
+          <Route path='/loan/biodiversity' element={<LoanPage type={"BIODIVERSITY"} />} />
+          <Route path='/loan/water' element={<LoanPage type={"WATER"} />} />
+          <Route path='/loan/climateAdaptation' element={<LoanPage type={"CLIMATE_ADAPTATION"} />} />
+          <Route path='/loan/climateMitigation' element={<LoanPage type={"CLIMATE_MITIGATION"} />} />
+          <Route path='/loan/pollutionPrevention' element={<LoanPage type={"POLLUTION_PREVENTION"} />} />
+          <Route path='/loan/circularEconomy' element={<LoanPage type={"CIRCULAR_ECONOMY"} />} />
+        </Routes>
 
-      {/* Questionnaire */}
-      <Routes>
-        <Route path="/questionnaire/:id" element={<LoanPage />} />
-      </Routes>
+
+        {/* Questionnaire */}
+        <Routes>
+          <Route path="/questionnaire/:id" element={<LoanPage />} />
+        </Routes>
 
         {/* Login pages */}
-      <Routes>
-        <Route path='/login/applicant' element={<Loginpage user='APPLICANT' />} />
-        <Route path='/login/bank' element={<Loginpage user='BANK' />} />
-        <Route path='/' element={<Landing />} />
-      </Routes>
-    </BrowserRouter>
+        <Routes>
+          <Route path='/login/applicant' element={<Loginpage user='APPLICANT' />} />
+          <Route path='/login/bank' element={<Loginpage user='BANK' />} />
+          <Route path='/' element={<Landing />} />
+        </Routes>
+      </BrowserRouter>
     </>
   )
 }

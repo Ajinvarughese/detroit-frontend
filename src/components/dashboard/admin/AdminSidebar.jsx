@@ -1,4 +1,4 @@
-import { Cog8ToothIcon, HomeIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
+import { Cog8ToothIcon, HomeIcon, PencilSquareIcon, UsersIcon } from "@heroicons/react/24/solid";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Feedback } from "@mui/icons-material";
 
@@ -6,8 +6,7 @@ const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const linkClass = (path) =>
-    `flex items-center gap-2 p-3 rounded-md hover:bg-blue-800 transition ${
-      location.pathname === path ? 'bg-blue-700' : ''
+    `flex items-center gap-2 p-3 rounded-md hover:bg-blue-800 transition ${location.pathname === path ? 'bg-blue-700' : ''
     }`;
 
   return (
@@ -17,6 +16,10 @@ const AdminSidebar = () => {
         <Link to="/admin" className={linkClass('/admin/dashboard')}>
           <HomeIcon className="h-5 w-5" />
           Dashboard
+        </Link>
+        <Link to="/admin/users" className={linkClass('/admin/users')}>
+          <UsersIcon className="h-5 w-5" />
+          Users
         </Link>
         <Link to="/admin/rules" className={linkClass('/admin/rules')}>
           <PencilSquareIcon className="h-5 w-5" />
