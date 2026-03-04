@@ -226,7 +226,7 @@ const LoanSummary = () => {
   useEffect(() => {
       const fetchLoan = async () => {
       try {
-          const res = await axios.get(`http://localhost:8080/api/loan/${id}`);
+          const res = await axios.get(`${useApi.url}/loan/${id}`);
           setLoan(res.data);
       } catch (err) {
           console.error('Error fetching loan:', err);
@@ -234,7 +234,7 @@ const LoanSummary = () => {
       };
 
       const fetchPayment = async () => {
-        const res = await axios.get(`http://localhost:8080/api/loan/payment/${id}`);
+        const res = await axios.get(`${useApi.url}/loan/payment/${id}`);
         setPayments(res.data.reverse());
       }
       fetchPayment();

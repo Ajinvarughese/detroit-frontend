@@ -129,38 +129,14 @@ export const page4 = {
 
 export const footer = [
   {
-    title: 'Ant Technology',
+    title: 'Loans',
     children: [
-      { title: 'Ant Financial Open Platform', link: 'https://open.alipay.com' },
-      { title: 'Ant Experience Cloud', link: 'https://xcloud.alipay.com' },
-      { title: 'Ant Financial Cloud', link: 'https://www.cloud.alipay.com' },
-    ],
-  },
-  {
-    title: 'Related Conferences',
-    children: [
-      { title: 'ATEC', link: 'https://atec.antfin.com' },
-      { title: 'SEE Conf', link: 'https://seeconf.alipay.com' },
-    ],
-  },
-  {
-    title: 'Contact Us',
-    children: [
-      { title: 'Ant Experience Tech Column on Zhihu', link: 'https://zhuanlan.zhihu.com/xtech' },
-      { title: 'Ant Experience Tech on Weibo', link: 'https://weibo.com/p/1005056420205486' },
-      { title: 'AntV on Weibo', link: 'https://weibo.com/antv2017' },
-      { title: 'Ant Design on Zhihu', link: 'https://zhuanlan.zhihu.com/antdesign' },
-    ],
-  },
-  {
-    title: 'Detroit',
-    icon: detroit,
-    children: [
-      { title: 'Ant Design', desc: 'Ant UI System', link: 'https://ant.design' },
-      { title: 'AntV', desc: 'Ant Data Visualization Solution', link: 'https://antv.alipay.com' },
-      // { title: 'AntG', desc: 'Ant Interactive Graphics Technology', link: 'http://antg.alipay.net' },
-      { title: 'Egg', desc: 'Enterprise-level Node Web Framework', link: 'https://eggjs.org' },
-      { title: 'Yunfengdie', desc: 'Mobile Site Builder Platform', link: 'https://fengdie.alipay-eco.com/intro' },
+      { title: 'Climate Mitigation Loans', link: '/loan/climateMitigation' },
+      { title: 'Water Sustainability Loans', link: '/loan/water' },
+      { title: 'Pollution Reduction Loans', link: '/loan/pollutionPrevention' },
+      { title: 'Climate Adaptation Loans', link: '/loan/climateAdaptation' },
+      { title: 'Circular Economy Loans', link: '/loan/circularEconomy' },
+      { title: 'Biodiversity & Conservation Loans', link: '/loan/biodiversity' },
     ],
   },
 ];

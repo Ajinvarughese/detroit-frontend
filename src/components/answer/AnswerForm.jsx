@@ -99,7 +99,7 @@ const AnswerForm = ({ preview = false }) => {
           answers: submission
         };
         console.log(param);
-        const res = await axios.post("http://localhost:8080/api/loan", param, {
+        const res = await axios.post(`${useApi.url}/loan`, param, {
           'Content-type': 'application/json'
         });
         navigate(`/loan/application/${toCamelCase(questionnaire.loanCategory)}/${res.data.loanUUID}`);
