@@ -347,36 +347,7 @@ const Form = ({ questionData, loanCategory, questionCount, isLast = false, onDel
                 </FormControl>
             </Box>
 
-            {isLast && (
-                <Box
-                    sx={{
-                        background: "#fff",
-                        maxWidth: "800px",
-                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                        width: "100%",
-                        mx: "auto",
-                        p: "2rem",
-                        pt: "0.5rem",
-                        borderRadius: 2,
-                        mb: 2
-                    }}
-                >
-                    <Typography sx={{ opacity: 0.7 }} variant="caption">
-                        You can ask built in questions like from below.
-                    </Typography>
-                    <Box
-                        sx={{
-                            mt: 2,
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: 2,
-                        }}
-                    >
-                        <Button variant="outlined" onClick={() => defaultQuestion("sector")}>What sector?</Button>
-                        <Button variant="outlined" onClick={() => defaultQuestion("activity")}>What activity?</Button>
-                    </Box>
-                </Box>
-            )}
+        
         </motion.div>
     );
 };

@@ -3,11 +3,13 @@ import axios from 'axios';
 import './Loginpage.css';
 import {
   FaUser, FaEnvelope, FaMapMarkerAlt, FaBuilding, FaPhone,
-  FaEye, FaEyeSlash, FaBriefcase
+  FaEye, FaEyeSlash, FaBriefcase,
+  FaLock
 } from "react-icons/fa";
 import { saveUser } from '../hooks/LocalStorageUser';
 import { useNavigate } from "react-router";
 import API from '../hooks/API';
+import { generateOtp, validateOtp } from '../../utils/otpApi';
 
 const useApi = API();
 
@@ -17,6 +19,9 @@ const Loginpage = ({ user }) => {
   const [showPass, setShowPass] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isRegistration, setIsRegistration] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [sendOtp, setSendOtp] = useState(false);
 
   const [loginData, setLoginData] = useState({
     email: '',
@@ -101,35 +106,57 @@ const Loginpage = ({ user }) => {
     }
   };
 
-  const handleRegisterSubmit = async (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
-
-    // Check if errors exist
+    setLoading(true);
     if (formErrors.phone || formErrors.password) {
-      return; // Block submit if errors
+      setLoading(false);
+      return;
     }
 
-    const data = {
-      fullName: `${registerData.firstName} ${registerData.lastName}`,
-      phone: registerData.phone,
-      email: registerData.email,
-      password: registerData.password,
-      address: registerData.address,
-      role: user === "APPLICANT" ? user : registerData.role,
-      organization: registerData.organization,
-      subRole: user === "APPLICANT" ? registerData.role : null
-    };
+    try {
+      await generateOtp({ email: registerData.email });
+      setSendOtp(true);
+    } catch (error) {
+      alert("Couldn't send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      const response = await axios.post(useApi.url + '/user', data, {
-        headers: { 'Content-Type': 'application/json' }
+      await validateOtp({
+        email: registerData.email,
+        otp: otp,
       });
-      console.log('Registration success:', response.data);
+
+      const data = {
+        fullName: `${registerData.firstName} ${registerData.lastName}`,
+        phone: registerData.phone,
+        email: registerData.email,
+        password: registerData.password,
+        address: registerData.address,
+        role: user === "APPLICANT" ? user : registerData.role,
+        organization: registerData.organization,
+        subRole: user === "APPLICANT" ? registerData.role : null,
+      };
+
+      const response = await axios.post(useApi.url + "/user", data);
       saveUser(response.data);
-      window.location.href = '/';
+      navigate("/");
     } catch (error) {
-      alert("User already exists");
-      console.error('Registration error:', error.response?.data || error.message);
+      if (axios.isAxiosError(error) && error?.response?.status === 401) {
+        alert("Invalid OTP");
+      } else {
+        alert("User already exists");
+        console.log(error);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -147,8 +174,8 @@ const Loginpage = ({ user }) => {
     <div className="container-login">
       <div
         style={{
-          width: '100%',
-          maxWidth: isRegistration ? '500px' : '400px'
+          width: "100%",
+          maxWidth: isRegistration ? "500px" : "400px",
         }}
         className="wrapper"
       >
@@ -178,14 +205,23 @@ const Loginpage = ({ user }) => {
                   value={loginData.password}
                   onChange={handleLoginChange}
                 />
-                <div className="icon" onClick={() => setShowPass(!showPass)} style={{ zIndex: 100, cursor: 'pointer' }}>
+                <div
+                  className="icon"
+                  onClick={() => setShowPass(!showPass)}
+                  style={{ zIndex: 100, cursor: "pointer" }}
+                >
                   {showPass ? <FaEye /> : <FaEyeSlash />}
                 </div>
               </div>
 
               <button type="submit">Login</button>
               <div className="register-link">
-                <p>Don't have an account? <a style={{ cursor: 'pointer' }} onClick={registerLink}>Register</a></p>
+                <p>
+                  Don't have an account?{" "}
+                  <a style={{ cursor: "pointer" }} onClick={registerLink}>
+                    Register
+                  </a>
+                </p>
               </div>
             </form>
           </div>
@@ -194,134 +230,197 @@ const Loginpage = ({ user }) => {
         {/* Registration Form */}
         {isRegistration && (
           <div className="form-box register">
-            <form onSubmit={handleRegisterSubmit}>
+            <form>
               <h1>Register</h1>
-              <div className="name-row">
-                <div className="input-box half">
-                  <input
-                    type="text"
-                    name="firstName"
-                    placeholder="First Name"
-                    required
-                    value={registerData.firstName}
-                    onChange={handleRegisterChange}
-                  />
-                  <FaUser className="icon" />
-                </div>
-                <div className="input-box half">
-                  <input
-                    type="text"
-                    name="lastName"
-                    placeholder="Last Name"
-                    required
-                    value={registerData.lastName}
-                    onChange={handleRegisterChange}
-                  />
-                  <FaUser className="icon" />
-                </div>
-              </div>
+              {!sendOtp ? (
+                <>
+                  <div className="name-row">
+                    <div className="input-box half">
+                      <input
+                        type="text"
+                        name="firstName"
+                        placeholder="First Name"
+                        required
+                        value={registerData.firstName}
+                        onChange={handleRegisterChange}
+                      />
+                      <FaUser className="icon" />
+                    </div>
+                    <div className="input-box half">
+                      <input
+                        type="text"
+                        name="lastName"
+                        placeholder="Last Name"
+                        required
+                        value={registerData.lastName}
+                        onChange={handleRegisterChange}
+                      />
+                      <FaUser className="icon" />
+                    </div>
+                  </div>
 
-              <div className="input-box">
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="Phone"
-                  required
-                  value={registerData.phone}
-                  onChange={handleRegisterChange}
-                />
-                <FaPhone className="icon" />
-              </div>
-              {formErrors.phone && <p style={{ color: "red", fontSize: "12px" }}>{formErrors.phone}</p>}
+                  <div className="input-box">
+                    <input
+                      type="text"
+                      name="phone"
+                      placeholder="Phone"
+                      required
+                      value={registerData.phone}
+                      onChange={handleRegisterChange}
+                    />
+                    <FaPhone className="icon" />
+                  </div>
+                  {formErrors.phone && (
+                    <p style={{ color: "red", fontSize: "12px" }}>
+                      {formErrors.phone}
+                    </p>
+                  )}
 
-              <div className="input-box">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  required
-                  value={registerData.email}
-                  onChange={handleRegisterChange}
-                />
-                <FaEnvelope className="icon" />
-              </div>
+                  <div className="input-box">
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email"
+                      required
+                      value={registerData.email}
+                      onChange={handleRegisterChange}
+                    />
+                    <FaEnvelope className="icon" />
+                  </div>
 
-              <div className="input-box">
-                <input
-                  type={showPass ? "text" : "password"}
-                  name="password"
-                  placeholder="Password"
-                  required
-                  value={registerData.password}
-                  onChange={handleRegisterChange}
-                />
-                <div onClick={() => setShowPass(!showPass)} style={{ cursor: 'pointer' }}>
-                  {showPass ? <FaEye className="icon" /> : <FaEyeSlash className="icon" />}
-                </div>
-              </div>
-              {formErrors.password && <p style={{ color: "red", fontSize: "12px" }}>{formErrors.password}</p>}
+                  <div className="input-box">
+                    <input
+                      type={showPass ? "text" : "password"}
+                      name="password"
+                      placeholder="Password"
+                      required
+                      value={registerData.password}
+                      onChange={handleRegisterChange}
+                    />
+                    <div
+                      onClick={() => setShowPass(!showPass)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {showPass ? (
+                        <FaEye className="icon" />
+                      ) : (
+                        <FaEyeSlash className="icon" />
+                      )}
+                    </div>
+                  </div>
+                  {formErrors.password && (
+                    <p style={{ color: "red", fontSize: "12px" }}>
+                      {formErrors.password}
+                    </p>
+                  )}
 
-              {user === "APPLICANT" && (
+                  {user === "APPLICANT" && (
+                    <>
+                      <div className="input-box">
+                        <input
+                          type="text"
+                          name="address"
+                          placeholder="Address"
+                          required
+                          value={registerData.address}
+                          onChange={handleRegisterChange}
+                        />
+                        <FaMapMarkerAlt className="icon" />
+                      </div>
+
+                      <div className="input-box">
+                        <input
+                          type="text"
+                          name="organization"
+                          placeholder="Organization"
+                          value={registerData.organization}
+                          onChange={handleRegisterChange}
+                        />
+                        <FaBuilding className="icon" />
+                      </div>
+
+                      <div className="input-box">
+                        <select
+                          name="role"
+                          value={registerData.subRole}
+                          onChange={handleRegisterChange}
+                          required
+                        >
+                          <option value="">Select Role</option>
+                          <option value="ENTERPRISE">Enterprise</option>
+                          <option value="GOVERNMENT">Government</option>
+                        </select>
+                        <FaBriefcase className="icon" />
+                      </div>
+                    </>
+                  )}
+
+                  {user === "BANK" && (
+                    <div className="input-box">
+                      <select
+                        name="role"
+                        value={registerData.role}
+                        onChange={handleRegisterChange}
+                        required
+                      >
+                        <option value="">Select Role</option>
+                        <option value="BANK">Bank</option>
+                        <option value="ADMIN">Admin</option>
+                      </select>
+                      <FaBriefcase className="icon" />
+                    </div>
+                  )}
+
+                  <button
+                    disabled={loading}
+                    style={{
+                      opacity: loading ? 0.5 : 1,
+                      cursor: loading ? "not-allowed" : "pointer",
+                    }}
+                    onClick={handleSendOtp}
+                  >
+                    {loading ? "Sending OTP..." : "Send OTP"}
+                  </button>
+
+                  <div className="register-link">
+                    <p>
+                      Already have an account?{" "}
+                      <a style={{ cursor: "pointer" }} onClick={loginLink}>
+                        Login
+                      </a>
+                    </p>
+                  </div>
+                </>
+              ) : (
                 <>
                   <div className="input-box">
                     <input
-                      type="text"
-                      name="address"
-                      placeholder="Address"
+                      type="email"
+                      disabled
+                      name="email"
+                      placeholder="email"
                       required
-                      value={registerData.address}
-                      onChange={handleRegisterChange}
+                      value={registerData.email}
                     />
-                    <FaMapMarkerAlt className="icon" />
+                    <FaEnvelope className="icon" />
                   </div>
-
                   <div className="input-box">
                     <input
                       type="text"
-                      name="organization"
-                      placeholder="Organization"
-                      value={registerData.organization}
-                      onChange={handleRegisterChange}
+                      name="otp"
+                      placeholder="OTP"
+                      required
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
                     />
-                    <FaBuilding className="icon" />
+                    <FaLock className="icon" />
                   </div>
 
-                  <div className="input-box">
-                    <select
-                      name="role"
-                      value={registerData.subRole}
-                      onChange={handleRegisterChange}
-                      required
-                    >
-                      <option value="">Select Role</option>
-                      <option value="ENTERPRISE">Enterprise</option>
-                      <option value="GOVERNMENT">Government</option>
-                    </select>
-                    <FaBriefcase className="icon" />
-                  </div>
+                  <button disabled={!otp} onClick={handleRegisterSubmit}>
+                    Sign up
+                  </button>
                 </>
               )}
-
-              {user === "BANK" && (
-                <div className="input-box">
-                  <select
-                    name="role"
-                    value={registerData.role}
-                    onChange={handleRegisterChange}
-                    required
-                  >
-                    <option value="">Select Role</option>
-                    <option value="BANK">Bank</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
-                  <FaBriefcase className="icon" />
-                </div>
-              )}
-
-              <button type="submit">Register</button>
-              <div className="register-link">
-                <p>Already have an account? <a style={{ cursor: 'pointer' }} onClick={loginLink}>Login</a></p>
-              </div>
             </form>
           </div>
         )}

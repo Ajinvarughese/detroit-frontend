@@ -145,7 +145,7 @@ const AnswerForm = ({ preview = false }) => {
             onClick={() => navigate(`/loan/${toCamelCase(questionnaire.loanCategory)}`)}
           >
             Go Back
-          </Button>
+          </Button>  
         </Paper>
       </Box>
     );
