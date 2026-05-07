@@ -75,8 +75,12 @@ const Loginpage = ({ user }) => {
       saveUser(response.data);
       navigate("/");
     } catch (error) {
-      alert("Username or password is incorrect.");
-      console.error('Login error:', error.response?.data || error.message);
+      if(axios.isAxiosError(error) && error?.response?.status === 403) {
+        navigate("/suspended")
+      } else {
+        alert("Username or password is incorrect.");
+        console.error('Login error:', error.response?.data || error.message);
+      }
     }
   };
 

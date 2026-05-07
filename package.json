@@ -11,6 +11,7 @@
     "host": "vite --host"
   },
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.39.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@heroicons/react": "^2.2.0",

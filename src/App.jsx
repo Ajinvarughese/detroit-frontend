@@ -15,6 +15,7 @@ import RuleEditor from './components/dashboard/admin/RuleEditor.jsx'
 import Rule from './components/rule/Rule';
 import Feedback from './components/dashboard/admin/Feedback';
 import UserManagement from './components/dashboard/admin/UserManagement';
+import SuspendedUser from './components/auth/Suspended';
 
 function App() {
   return (
@@ -77,6 +78,12 @@ function App() {
           <Route path='/login/applicant' element={<Loginpage user='APPLICANT' />} />
           <Route path='/login/bank' element={<Loginpage user='BANK' />} />
           <Route path='/' element={<Landing />} />
+        </Routes>
+
+
+        {/* SUSPENDED PAGE */}
+        <Routes>
+          <Route path='/suspended' element={<SuspendedUser />} />
         </Routes>
       </BrowserRouter>
     </>

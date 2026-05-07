@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import {
   Box,
@@ -18,8 +18,15 @@ import { useNavigate, useParams } from 'react-router';
 import { getUser } from '../hooks/LocalStorageUser';
 import { toCamelCase } from '../hooks/EnumToString';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import API from '../hooks/API';
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
+
+const elevenlabs = new ElevenLabsClient({
+  apiKey: import.meta.env.VITE_ELEVENLABS_API_KEY, // Vite
+});
+
 
 const { Option } = Select;
 const useApi = API();
@@ -32,6 +39,76 @@ const AnswerForm = ({ preview = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notEligible, setNotEligible] = useState(false);
+
+
+  const [audioMap, setAudioMap] = useState({});
+  const audioRef = useRef(null);
+  const getAudio = async (question) => {
+    try {
+      // 🔥 Skip if already cached
+      if (audioMap[question.id]) return;
+
+      const stream = await elevenlabs.textToSpeech.convert(
+        "JBFqnCBsd6RMkjVDRZzb",
+        {
+          text: question.text,
+          modelId: "eleven_multilingual_v2",
+          outputFormat: "mp3_44100_128",
+        }
+      );
+
+      const reader = stream.getReader();
+      const chunks = [];
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+
+      const audioData = new Uint8Array(
+        chunks.reduce((acc, chunk) => acc + chunk.length, 0)
+      );
+
+      let offset = 0;
+      for (const chunk of chunks) {
+        audioData.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      const blob = new Blob([audioData], { type: "audio/mpeg" });
+      const url = URL.createObjectURL(blob);
+
+      // 🔥 Store per question
+      setAudioMap((prev) => ({
+        ...prev,
+        [question.id]: url,
+      }));
+    } catch (err) {
+      console.error("TTS Error:", err);
+    }
+  };
+
+  const speak = (question) => {
+    const audioUrl = audioMap[question.id];
+
+    if (!audioUrl) {
+      console.warn("Audio not ready yet...");
+      getAudio(question);
+      return;
+    }
+
+    // 🔥 Stop previous audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
+    const audio = new Audio(audioUrl);
+    audioRef.current = audio;
+
+    audio.play().catch((err) => console.error("Play error:", err));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,11 +132,29 @@ const AnswerForm = ({ preview = false }) => {
     fetchData();
   }, [id]);
 
+  useEffect(() => {
+    if (questions.length > 0) {
+      // preload current question
+      getAudio(questions[currentIndex]);
+
+      // preload next question (⚡ smooth UX)
+      if (questions[currentIndex + 1]) {
+        getAudio(questions[currentIndex + 1]);
+      }
+    }
+  }, [currentIndex, questions]);
+
   const handleChange = (qid, value) => {
     setResponses((prev) => ({ ...prev, [qid]: value }));
   };
 
   const handleNext = () => {
+    // 🔥 stop audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
@@ -68,6 +163,12 @@ const AnswerForm = ({ preview = false }) => {
   };
 
   const handlePrev = () => {
+    // 🔥 stop audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
     }
@@ -75,6 +176,10 @@ const AnswerForm = ({ preview = false }) => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
     const submission = Object.values(responses).flatMap((response) => {
       if (Array.isArray(response)) {
         return response.map((res) => ({
@@ -164,22 +269,30 @@ const AnswerForm = ({ preview = false }) => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        backgroundImage: 'url(https://img.freepik.com/free-vector/subtle-rombus-white-gray-pattern-background_1017-25098.jpg)',
-        backgroundSize: 'cover',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        minHeight: "100vh",
+        backgroundImage:
+          "url(https://img.freepik.com/free-vector/subtle-rombus-white-gray-pattern-background_1017-25098.jpg)",
+        backgroundSize: "cover",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         p: 2,
       }}
     >
-      <Paper elevation={6} sx={{ 
-          width: 500, 
-          p: 4, 
-          borderRadius: 3 
-        }}>
+      <Paper
+        elevation={6}
+        sx={{
+          width: 500,
+          p: 4,
+          borderRadius: 3,
+        }}
+      >
         <Box display="flex" alignItems="center" mb={4}>
-          <Button onClick={handlePrev} disabled={currentIndex === 0} startIcon={<ArrowBackIcon />}>
+          <Button
+            onClick={handlePrev}
+            disabled={currentIndex === 0}
+            startIcon={<ArrowBackIcon />}
+          >
             Back
           </Button>
           <Box sx={{ flexGrow: 1, ml: 2 }}>
@@ -190,59 +303,84 @@ const AnswerForm = ({ preview = false }) => {
           </Box>
         </Box>
 
-        <Typography variant="h6" gutterBottom>{question.text}</Typography>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography variant="h6" gutterBottom>
+            {question.text}
+          </Typography>
+
+          <VolumeUpIcon
+            sx={{ cursor: "pointer" }}
+            onClick={() => speak(question)}
+          />
+        </Box>
         <Typography variant="body2" color="text.secondary" mb={3}>
-          {question.type === 'TEXT'
-            ? 'Please enter your answer here.'
-            : question.type === 'RADIO'
-            ? 'Please select an option.'
-            : question.type === 'FILE'
-            ? 'Please upload your file here.'
-            : question.type === 'CHECKBOX'
-            ? 'Please select all that apply.'
-            : question.type === 'DROPDOWN'
-            ? 'Please select an option from the dropdown.'
-            : ''}
+          {question.type === "TEXT"
+            ? "Please enter your answer here."
+            : question.type === "RADIO"
+            ? "Please select an option."
+            : question.type === "FILE"
+            ? "Please upload your file here."
+            : question.type === "CHECKBOX"
+            ? "Please select all that apply."
+            : question.type === "DROPDOWN"
+            ? "Please select an option from the dropdown."
+            : ""}
         </Typography>
 
         {/* Render different input types */}
-        {question.type === 'TEXT' && (
+        {question.type === "TEXT" && (
           <TextField
             fullWidth
             variant="outlined"
-            value={responses[question.id]?.value || ''}
-            onChange={(e) => handleChange(question.id, { value: e.target.value })}
+            value={responses[question.id]?.value || ""}
+            onChange={(e) =>
+              handleChange(question.id, { value: e.target.value })
+            }
           />
         )}
-        {question.type === 'RADIO' && (
+        {question.type === "RADIO" && (
           <FormControl component="fieldset">
             <RadioGroup
-              value={responses[question.id]?.choiceId || ''}
+              value={responses[question.id]?.choiceId || ""}
               onChange={(e) =>
                 handleChange(question.id, {
                   choiceId: parseInt(e.target.value),
-                  value: question.options.find((o) => o.id === parseInt(e.target.value)).text,
+                  value: question.options.find(
+                    (o) => o.id === parseInt(e.target.value)
+                  ).text,
                 })
               }
             >
               {question.options.map((opt) => (
-                <FormControlLabel key={opt.id} value={opt.id} control={<Radio />} label={opt.text} />
+                <FormControlLabel
+                  key={opt.id}
+                  value={opt.id}
+                  control={<Radio />}
+                  label={opt.text}
+                />
               ))}
             </RadioGroup>
           </FormControl>
         )}
-        {question.type === 'CHECKBOX' && (
+        {question.type === "CHECKBOX" && (
           <FormControl component="fieldset">
             {question.options.map((opt) => (
               <FormControlLabel
                 key={opt.id}
                 control={
                   <Checkbox
-                    checked={responses[question.id]?.some((res) => res.choiceId === opt.id) || false}
+                    checked={
+                      responses[question.id]?.some(
+                        (res) => res.choiceId === opt.id
+                      ) || false
+                    }
                     onChange={(e) => {
                       const prevChoices = responses[question.id] || [];
                       const updatedChoices = e.target.checked
-                        ? [...prevChoices, { choiceId: opt.id, value: opt.text }]
+                        ? [
+                            ...prevChoices,
+                            { choiceId: opt.id, value: opt.text },
+                          ]
                         : prevChoices.filter((res) => res.choiceId !== opt.id);
                       handleChange(question.id, updatedChoices);
                     }}
@@ -253,28 +391,45 @@ const AnswerForm = ({ preview = false }) => {
             ))}
           </FormControl>
         )}
-        {question.type === 'FILE' && (
+        {question.type === "FILE" && (
           <Button variant="outlined" component="label" fullWidth sx={{ mt: 2 }}>
             Upload File
             <input
               type="file"
               hidden
-              onChange={(e) => handleChange(question.id, { file: e.target.files[0] })}
+              onChange={(e) =>
+                handleChange(question.id, { file: e.target.files[0] })
+              }
             />
           </Button>
         )}
-        {question.type === 'DROPDOWN' && (
+        {question.type === "DROPDOWN" && (
           <Select
-            style={{ width: '100%', height: 54 }}
+            style={{ width: "100%", height: 54 }}
             placeholder="Select an option"
             value={responses[question.id]?.choiceId || undefined}
             onChange={(value) => {
-              const selectedOption = question.options.find((opt) => opt.id === value);
-              handleChange(question.id, { choiceId: selectedOption.id, value: selectedOption.text });
+              const selectedOption = question.options.find(
+                (opt) => opt.id === value
+              );
+              handleChange(question.id, {
+                choiceId: selectedOption.id,
+                value: selectedOption.text,
+              });
             }}
           >
             {question.options.map((opt) => (
-              <Option style={{padding: "15px 10px", borderRadius: '0', borderTop:"1px solid #ccc"}} key={opt.id} value={opt.id}>{opt.text}</Option>
+              <Option
+                style={{
+                  padding: "15px 10px",
+                  borderRadius: "0",
+                  borderTop: "1px solid #ccc",
+                }}
+                key={opt.id}
+                value={opt.id}
+              >
+                {opt.text}
+              </Option>
             ))}
           </Select>
         )}
@@ -286,10 +441,11 @@ const AnswerForm = ({ preview = false }) => {
           onClick={handleNext}
           disabled={
             !responses[question.id] ||
-            (question.type === 'CHECKBOX' && responses[question.id].length === 0)
+            (question.type === "CHECKBOX" &&
+              responses[question.id].length === 0)
           }
         >
-          {currentIndex === questions.length - 1 ? 'Submit' : 'Continue'}
+          {currentIndex === questions.length - 1 ? "Submit" : "Continue"}
         </Button>
       </Paper>
     </Box>
